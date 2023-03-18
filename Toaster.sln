@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toaster", "Toaster\Toaster.csproj", "{10C48750-43F2-41D6-9A92-C9B680ADDCD2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toaster.Tests", "Toaster.Tests\Toaster.Tests.csproj", "{C2BE9430-7314-4809-8C5B-C23918A08180}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{10C48750-43F2-41D6-9A92-C9B680ADDCD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10C48750-43F2-41D6-9A92-C9B680ADDCD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10C48750-43F2-41D6-9A92-C9B680ADDCD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10C48750-43F2-41D6-9A92-C9B680ADDCD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2BE9430-7314-4809-8C5B-C23918A08180}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2BE9430-7314-4809-8C5B-C23918A08180}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2BE9430-7314-4809-8C5B-C23918A08180}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2BE9430-7314-4809-8C5B-C23918A08180}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
