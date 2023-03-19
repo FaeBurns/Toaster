@@ -93,7 +93,7 @@ public class Parser
                     TokenPosition position = new TokenPosition(lineIndex, startPosition, (startPosition + validMatchResult.Length) - 1);
 
                     // create token and add to list
-                    Token token = new Token(validMatchResult.Value, matchingRule!.ResultingType, position, validMatchResult);
+                    Token token = new Token(validMatchResult.Value, matchingRule!.ResultingType, position, matchingRule.IsComment, validMatchResult);
                     tokens.Add(token);
                 }
 

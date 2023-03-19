@@ -1,5 +1,8 @@
-﻿namespace Toaster;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace Toaster;
+
+[ExcludeFromCodeCoverage]
 public class Error
 {
     public string Message { get; }

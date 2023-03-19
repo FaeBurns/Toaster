@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Toaster.Parsing;
 
@@ -35,6 +36,7 @@ public class TokenPosition
     /// </summary>
     public int Length => (EndColumn - StartColumn) + 1;
 
+    [ExcludeFromCodeCoverage]
     public override bool Equals(object obj)
     {
         if (ReferenceEquals(null, obj)) return false;
@@ -43,6 +45,7 @@ public class TokenPosition
         return Equals((TokenPosition)obj);
     }
 
+    [ExcludeFromCodeCoverage]
     protected bool Equals(TokenPosition other)
     {
         return Line == other.Line
@@ -50,6 +53,7 @@ public class TokenPosition
                && EndColumn == other.EndColumn;
     }
 
+    [ExcludeFromCodeCoverage]
     public override int GetHashCode()
     {
         unchecked

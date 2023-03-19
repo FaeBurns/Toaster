@@ -85,6 +85,6 @@ public enum TokenType
     /// <summary>
     /// Comment, causes any proceeding characters to be collected and sent as one token.
     /// </summary>
-    [TokenRule(@"([;#].*)")]
+    [TokenRule(@"([;#].*)", IsComment = true)]
     COMMENT = 200,
 }

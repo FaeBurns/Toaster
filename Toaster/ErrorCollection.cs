@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Toaster;
 
+[ExcludeFromCodeCoverage]
 public class ErrorCollection
 {
-    private List<Error> _errors = new List<Error>();
+    private readonly List<Error> _errors = new List<Error>();
 
     public IReadOnlyList<Error> Errors => _errors;
 
