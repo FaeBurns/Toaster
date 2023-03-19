@@ -38,7 +38,16 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Parser.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="Token.cs" />
+        <Compile Include="TokenCollection.cs" />
+        <Compile Include="TokenPosition.cs" />
+        <Compile Include="TokenRuleAttribute.cs" />
+        <Compile Include="TokenType.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="sample\zoo.tst" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
