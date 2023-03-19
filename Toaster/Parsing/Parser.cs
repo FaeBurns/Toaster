@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Linq;
+using System.Reflection;
+using System.Security;
+using System.Text.RegularExpressions;
 
-namespace Toaster;
+namespace Toaster.Parsing;
 
 public class Parser
 {
@@ -18,12 +17,14 @@ public class Parser
         _tokenRules = GetTokenRules();
     }
 
+    public ErrorCollection Errors { get; } = new ErrorCollection();
+
     /// <summary>
     /// Tokenizes the provided program string
     /// </summary>
     /// <param name="program">The program to tokenize.</param>
     /// <returns>The tokenized program.</returns>
-    public TokenProgram Toast(string program)
+    public TokenProgram Tokenize(string program)
     {
         // split lines without removing empty lines
         string[] lines = program.Split(_lineSeparators, StringSplitOptions.None);
@@ -57,7 +58,8 @@ public class Parser
 
         List<Token> tokens = new List<Token>();
 
-        while (searchingSection.Length > 0)
+        // loop while there is still text to search and a critical error has not occured
+        while (searchingSection.Length > 0 && Errors.HighestErrorLevel != ErrorLevel.ERROR)
         {
             TokenRule matchingRule = null;
             Match validMatchResult = null;
@@ -67,7 +69,10 @@ public class Parser
                 Match matchResult = rule.TryMatch(searchingSection);
 
                 // if the match was successful and was at the start
-                if (matchResult.Success && matchResult.Index == 0)
+                // and it is not restricted to first only or if it is restricted, there are no recorded tokens before it
+                // use tokens.Count instead of startPosition as startPosition increases on whitespace
+                if (matchResult.Success && matchResult.Index == 0 &&
+                    (!rule.MustBeFirst || (rule.MustBeFirst && tokens.Count == 0)))
                 {
                     // set required data
                     matchingRule = rule;
@@ -81,24 +86,25 @@ public class Parser
             // if a match was found
             if (matchingRule != null)
             {
-                // set search area to continue after current match
-                searchingSection = searchingSection.Substring(validMatchResult.Length);
-
                 // skip if rule says to discard
                 if (!matchingRule.IsDiscarded)
                 {
                     // get position of token in program
-                    TokenPosition position = new TokenPosition(lineIndex, startPosition, startPosition + validMatchResult.Length);
+                    TokenPosition position = new TokenPosition(lineIndex, startPosition, (startPosition + validMatchResult.Length) - 1);
 
                     // create token and add to list
                     Token token = new Token(validMatchResult.Value, matchingRule!.ResultingType, position, validMatchResult);
                     tokens.Add(token);
                 }
+
+                // set search area to continue after current match
+                searchingSection = searchingSection.Substring(validMatchResult.Length);
+                startPosition += validMatchResult.Length;
             }
             // if no match was found
             else
             {
-
+                Errors.RaiseError("Unable to parse remainder of line", lineIndex, startPosition);
             }
         }
 
@@ -111,7 +117,7 @@ public class Parser
         List<TokenRule> rules = new List<TokenRule>();
 
         // get all enum values
-        TokenType[] orderedTokenTypes = ((TokenType[])Enum.GetValues(typeof(TokenType))).OrderByDescending(t => t).ToArray();
+        TokenType[] orderedTokenTypes = ((TokenType[])Enum.GetValues(typeof(TokenType))).OrderBy(t => t).ToArray();
 
         // loop through all values and get information from attribute
         foreach (TokenType tokenType in orderedTokenTypes)
@@ -120,7 +126,7 @@ public class Parser
 
             // ignore if no attribute found
             if (attribute != null)
-                rules.Add(new TokenRule(attribute.Regex, tokenType , attribute.DiscardSelf, attribute.IsComment));
+                rules.Add(new TokenRule(attribute.Regex, tokenType , attribute.DiscardSelf, attribute.IsComment, attribute.MustBeFirst));
         }
 
         return rules.ToArray();

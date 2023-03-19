@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
-namespace Toaster;
+namespace Toaster.Parsing;
 
 public class TokenLine
 {
@@ -13,6 +12,7 @@ public class TokenLine
         OffsetLineIndex = offsetLineIndex;
 
         Tokens = tokens.ToArray();
+        TokenTypes = Tokens.Select(t => t.Type).ToArray();
     }
 
     /// <summary>
@@ -49,4 +49,9 @@ public class TokenLine
     /// Gets a collection of all tokens in the line.
     /// </summary>
     public IReadOnlyList<Token> Tokens { get; }
+
+    /// <summary>
+    /// Gets a collection of all <see cref="TokenType">TokenTypes</see> in the line.
+    /// </summary>
+    public IReadOnlyList<TokenType> TokenTypes { get; }
 }

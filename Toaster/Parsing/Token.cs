@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Toaster;
+namespace Toaster.Parsing;
 
 /// <summary>
 /// A class representing a token found in a program.

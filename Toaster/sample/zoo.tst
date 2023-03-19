@@ -15,7 +15,8 @@ bne loop $reg0 $reg1
 
 ; sph - set pin(s) high - sph .p0
 ; spl - set pin(s) low - spl .p0..p3
-; stp - set pin(s) value - stp .p0:2 1
+; spv - set pin(s) value - stp .p0:2 1
+; lpv - load pin value - lpv $reg0 .p0..p3 - does not work on multiple pins
 
 sph .p0
 slp 2

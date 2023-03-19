@@ -1,4 +1,4 @@
-﻿namespace Toaster;
+﻿namespace Toaster.Parsing;
 
 /// <summary>
 /// Defines the types of tokens that can be parsed
@@ -9,14 +9,14 @@ public enum TokenType
     /// <para>A label defines a line that the program can jump to.</para>
     /// <para>:name</para>
     /// </summary>
-    [TokenRule(@"^:([a-zA-Z]+)")]
+    [TokenRule(@":([a-zA-Z]+[a-zA-Z0-9_]+)", MustBeFirst = true)]
     LABEL = 0,
 
     /// <summary>
     /// <para>An instruction describes an instruction name. Instruction lines can only occur at the start of a line.</para>
     /// <para>name</para>
     /// </summary>
-    [TokenRule(@"^([a-zA-Z]+)")]
+    [TokenRule(@"([a-zA-Z]+)", MustBeFirst = true)]
     INSTRUCTION = 1,
 
     /// <summary>
@@ -30,29 +30,30 @@ public enum TokenType
     /// <para>An instruction argument (usually label name).</para>
     /// <para>name</para>
     /// </summary>
-    [TokenRule(@"[a-zA-Z]+")]
+    [TokenRule(@"([a-zA-Z]+[a-zA-Z0-9_]+)")]
     NAME = 3,
-
-    /// <summary>
-    /// <para>A pin defines a specific pin that data can be sent/received from.</para>
-    /// <para>.p0, .p1</para>
-    /// </summary>
-    [TokenRule(@"\.p([0-9]+)")]
-    PIN = 10,
 
     /// <summary>
     /// <para>A pin range defines sequential range of pins that data can be sent/received from.</para>
     /// <para>.p0..p8</para>
     /// </summary>
     [TokenRule(@"\.p([0-9]+)\.\.p([0-9]+)")]
-    PIN_RANGE = 11,
+    PIN_RANGE = 10,
 
     /// <summary>
     /// <para>A pin range length is another way of defining a pin range <seealso cref="PIN_RANGE"/> in a way that may be more readable.</para>
     /// <para>.p0:8</para>
     /// </summary>
     [TokenRule(@"\.p([0-9]+):([0-9]+)")]
-    PIN_RANGE_LENGTH = 12,
+    PIN_RANGE_LENGTH = 11,
+
+    /// <summary>
+    /// <para>A pin defines a specific pin that data can be sent/received from.</para>
+    /// <para>Pin must be ordered after other pin rules as those will also pick it up</para>
+    /// <para>.p0, .p1</para>
+    /// </summary>
+    [TokenRule(@"\.p([0-9]+)")]
+    PIN = 19,
 
     /// <summary>
     /// <para>A binary number. Maximum of 16 bits, minimum of 1. That single bit can be a 0.</para>

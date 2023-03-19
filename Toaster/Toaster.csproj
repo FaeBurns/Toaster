@@ -39,18 +39,21 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="Parser\Parser.cs" />
-        <Compile Include="Parser\ParsingError.cs" />
-        <Compile Include="Parser\Token.cs" />
-        <Compile Include="Parser\TokenLine.cs" />
-        <Compile Include="Parser\TokenPosition.cs" />
-        <Compile Include="Parser\TokenProgram.cs" />
-        <Compile Include="Parser\TokenRule.cs" />
-        <Compile Include="Parser\TokenRuleAttribute.cs" />
-        <Compile Include="Parser\TokenType.cs" />
+        <Compile Include="Parsing\Parser.cs" />
+        <Compile Include="Parsing\Token.cs" />
+        <Compile Include="Parsing\TokenLine.cs" />
+        <Compile Include="Parsing\TokenPosition.cs" />
+        <Compile Include="Parsing\TokenProgram.cs" />
+        <Compile Include="Parsing\TokenRule.cs" />
+        <Compile Include="Parsing\TokenRuleAttribute.cs" />
+        <Compile Include="Parsing\TokenType.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="Error.cs" />
+        <Compile Include="ErrorCollection.cs" />
     </ItemGroup>
     <ItemGroup>
+      <Content Include="sample\passthrough.tst" />
+      <Content Include="sample\token_zoo.tst" />
       <Content Include="sample\zoo.tst" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

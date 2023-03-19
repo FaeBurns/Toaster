@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Toaster;
+namespace Toaster.Parsing;
 
 /// <summary>
 /// A class that contains all tokens and related information for a program
