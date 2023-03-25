@@ -6,17 +6,17 @@ namespace Toaster.Parsing
     {
         private readonly Regex _solver;
 
-        public TokenRule(string regexString, TokenType resultingType, bool isDiscarded, bool isComment, bool mustBeFirst)
+        public TokenRule(string regexString, TokenId resultingId, bool isDiscarded, bool isComment, bool mustBeFirst)
         {
             _solver = new Regex(regexString);
 
-            ResultingType = resultingType;
+            ResultingId = resultingId;
             IsDiscarded = isDiscarded;
             IsComment = isComment;
             MustBeFirst = mustBeFirst;
         }
 
-        public TokenType ResultingType { get; }
+        public TokenId ResultingId { get; }
 
         public bool IsDiscarded { get; }
 

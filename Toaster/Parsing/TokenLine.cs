@@ -12,7 +12,7 @@ public class TokenLine
         OffsetLineIndex = offsetLineIndex;
 
         Tokens = tokens.ToArray();
-        TokenTypes = Tokens.Select(t => t.Type).ToArray();
+        TokenIds = Tokens.Select(t => t.Id).ToArray();
     }
 
     /// <summary>
@@ -43,7 +43,7 @@ public class TokenLine
     /// <summary>
     /// Gets a value indicating whether this line starts with an instruction.
     /// </summary>
-    public bool IsInstruction => !IsEmpty && Tokens[0].Type == TokenType.INSTRUCTION;
+    public bool IsInstruction => !IsEmpty && Tokens[0].Id == TokenId.INSTRUCTION;
 
     /// <summary>
     /// Gets a collection of all tokens in the line.
@@ -51,7 +51,7 @@ public class TokenLine
     public IReadOnlyList<Token> Tokens { get; }
 
     /// <summary>
-    /// Gets a collection of all <see cref="TokenType">TokenTypes</see> in the line.
+    /// Gets a collection of all <see cref="TokenId">TokenTypes</see> in the line.
     /// </summary>
-    public IReadOnlyList<TokenType> TokenTypes { get; }
+    public IReadOnlyList<TokenId> TokenIds { get; }
 }

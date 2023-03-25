@@ -3,7 +3,7 @@
 /// <summary>
 /// Defines the types of tokens that can be parsed
 /// </summary>
-public enum TokenType
+public enum TokenId
 {
     /// <summary>
     /// <para>A label defines a line that the program can jump to.</para>

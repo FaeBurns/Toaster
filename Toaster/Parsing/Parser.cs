@@ -93,7 +93,7 @@ public class Parser
                     TokenPosition position = new TokenPosition(lineIndex, startPosition, (startPosition + validMatchResult.Length) - 1);
 
                     // create token and add to list
-                    Token token = new Token(validMatchResult.Value, matchingRule!.ResultingType, position, matchingRule.IsComment, validMatchResult);
+                    Token token = new Token(validMatchResult.Value, matchingRule!.ResultingId, position, matchingRule.IsComment, validMatchResult);
                     tokens.Add(token);
                 }
 
@@ -117,10 +117,10 @@ public class Parser
         List<TokenRule> rules = new List<TokenRule>();
 
         // get all enum values
-        TokenType[] orderedTokenTypes = ((TokenType[])Enum.GetValues(typeof(TokenType))).OrderBy(t => t).ToArray();
+        TokenId[] orderedTokenTypes = ((TokenId[])Enum.GetValues(typeof(TokenId))).OrderBy(t => t).ToArray();
 
         // loop through all values and get information from attribute
-        foreach (TokenType tokenType in orderedTokenTypes)
+        foreach (TokenId tokenType in orderedTokenTypes)
         {
             TokenRuleAttribute attribute = GetEnumAttribute<TokenRuleAttribute>(tokenType);
 

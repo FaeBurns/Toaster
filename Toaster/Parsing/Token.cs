@@ -7,10 +7,10 @@ namespace Toaster.Parsing;
 /// </summary>
 public class Token
 {
-    public Token(string value, TokenType type, TokenPosition position, bool isComment, Match regexResult)
+    public Token(string value, TokenId id, TokenPosition position, bool isComment, Match regexResult)
     {
         Value = value;
-        Type = type;
+        Id = id;
         Position = position;
         IsComment = isComment;
         RegexResult = regexResult;
@@ -24,7 +24,7 @@ public class Token
     /// <summary>
     /// Gets what type of token this is.
     /// </summary>
-    public TokenType Type { get; }
+    public TokenId Id { get; }
 
     /// <summary>
     /// Gets the string value that makes up this token.

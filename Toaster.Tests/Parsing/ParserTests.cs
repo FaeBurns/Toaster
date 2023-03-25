@@ -87,22 +87,22 @@ public class ParserTests
         Parser parser = new Parser();
         TokenProgram tokenProgram = parser.Tokenize(programText);
 
-        TokenType[][] types = new TokenType[tokenProgram.Lines.Count][];
+        TokenId[][] types = new TokenId[tokenProgram.Lines.Count][];
 
         for (int i = 0; i < tokenProgram.Lines.Count; i++)
         {
-            types[i] = tokenProgram.Lines[i].TokenTypes.ToArray();
+            types[i] = tokenProgram.Lines[i].TokenIds.ToArray();
         }
 
         Assert.AreEqual(7, types.Length);
 
-        Assert.AreEqual(new [] {TokenType.LABEL}, types[0]);
-        Assert.AreEqual(Array.Empty<TokenType>(), types[1]);
-        Assert.AreEqual(new [] {TokenType.INSTRUCTION, TokenType.REGISTER, TokenType.REGISTER}, types[2]);
-        Assert.AreEqual(new [] {TokenType.INSTRUCTION, TokenType.PIN, TokenType.PIN_RANGE, TokenType.PIN_RANGE_LENGTH}, types[3]);
-        Assert.AreEqual(new [] {TokenType.INSTRUCTION, TokenType.NAME, TokenType.HEX, TokenType.INTEGER, TokenType.BINARY, TokenType.COMMENT}, types[4]);
-        Assert.AreEqual(Array.Empty<TokenType>(), types[5]);
-        Assert.AreEqual(new [] {TokenType.COMMENT}, types[6]);
+        Assert.AreEqual(new [] {TokenId.LABEL}, types[0]);
+        Assert.AreEqual(Array.Empty<TokenId>(), types[1]);
+        Assert.AreEqual(new [] {TokenId.INSTRUCTION, TokenId.REGISTER, TokenId.REGISTER}, types[2]);
+        Assert.AreEqual(new [] {TokenId.INSTRUCTION, TokenId.PIN, TokenId.PIN_RANGE, TokenId.PIN_RANGE_LENGTH}, types[3]);
+        Assert.AreEqual(new [] {TokenId.INSTRUCTION, TokenId.NAME, TokenId.HEX, TokenId.INTEGER, TokenId.BINARY, TokenId.COMMENT}, types[4]);
+        Assert.AreEqual(Array.Empty<TokenId>(), types[5]);
+        Assert.AreEqual(new [] {TokenId.COMMENT}, types[6]);
     }
 
     [Test]
