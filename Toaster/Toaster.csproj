@@ -39,6 +39,9 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Execution\ExecutionConfig.cs" />
+        <Compile Include="Execution\ExecutionConfigValidator.cs" />
+        <Compile Include="Execution\Interpreter.cs" />
         <Compile Include="Parsing\Parser.cs" />
         <Compile Include="Parsing\Token.cs" />
         <Compile Include="Parsing\TokenLine.cs" />
