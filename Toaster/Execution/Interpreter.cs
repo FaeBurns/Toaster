@@ -37,6 +37,8 @@ public class Interpreter : IExecutionContext
 
         if (validator.HasErrors)
             throw new ArgumentException($"validation of argument {config} shows errors", nameof(config));
+
+        CreateRegisters();
     }
 
     /// <summary>
@@ -145,5 +147,30 @@ public class Interpreter : IExecutionContext
         }
 
         return -1;
+    }
+
+    private void CreateRegisters()
+    {
+        // add guaranteed registers
+        _registerValues.Add("acc", 0);
+        _registerValues.Add("t", 0);
+        _registerValues.Add("ra", 0);
+        _registerValues.Add("rv", 0);
+
+        // create from config
+        for (int i = 0; i < _config.BasicRegisterCount; i++)
+        {
+            _registerValues.Add("r" + i, 0);
+        }
+
+        for (int i = 0; i < _config.StackRegisterCount; i++)
+        {
+            _registerValues.Add("s" + i, 0);
+        }
+
+        foreach (string namedRegister in _config.NamedRegisters)
+        {
+            _registerValues.Add(namedRegister, 0);
+        }
     }
 }
