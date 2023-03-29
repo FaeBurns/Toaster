@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Toaster.Parsing;
 
 namespace Toaster;
 
@@ -7,25 +8,29 @@ public class Error
 {
     public string Message { get; }
 
-    public int Line { get; }
-
-    public int Column { get; }
+    public TokenPosition Position { get; }
 
     public ErrorLevel Level { get; }
 
-    public Error(string message, int line, int column, ErrorLevel level)
+    public Error(string message, TokenPosition position, ErrorLevel level)
+    {
+        Message = message;
+        Position = position;
+        Level = level;
+    }
+
+    public Error(string message, int line, int startColumn, int endColumn, ErrorLevel level)
     {
         Message = message;
 
-        Line = line;
-        Column = column;
+        Position = new TokenPosition(line, startColumn, endColumn);
 
         Level = level;
     }
 
     public override string ToString()
     {
-        return $"(Line: {Line} | Column: {Column} | ErrorLevel: {Level} | Message: {Message})";
+        return $"(Line: {Position.Line} | Column: {Position.StartColumn} | ErrorLevel: {Level} | Message: {Message})";
     }
 }
 

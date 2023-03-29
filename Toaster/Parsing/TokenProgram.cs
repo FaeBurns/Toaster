@@ -8,8 +8,11 @@ namespace Toaster.Parsing;
 /// </summary>
 public class TokenProgram
 {
-    public TokenProgram(IEnumerable<TokenLine> lines)
+    public TokenProgram(IEnumerable<TokenLine> lines, string[] fullProgramLines, int lastInstructionIndex)
     {
+        FullProgramLines = fullProgramLines;
+        LastInstructionIndex = lastInstructionIndex;
+
         // create array copies
         Lines = lines.ToArray();
 
@@ -26,4 +29,14 @@ public class TokenProgram
     /// Gets the collection of all token lines that start with an instruction.
     /// </summary>
     public IReadOnlyList<TokenLine> InstructionLines { get; }
+
+    /// <summary>
+    /// Gets the full program as an array of its lines.
+    /// </summary>
+    public string[] FullProgramLines { get; }
+
+    /// <summary>
+    /// Gets the LineIndex of the last instruction line.
+    /// </summary>
+    public int LastInstructionIndex { get; }
 }

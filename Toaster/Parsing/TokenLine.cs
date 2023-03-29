@@ -46,6 +46,11 @@ public class TokenLine
     public bool IsInstruction => !IsEmpty && Tokens[0].Id == TokenId.INSTRUCTION;
 
     /// <summary>
+    /// Gets a value indicating whether this line starts with a label.
+    /// </summary>
+    public bool IsLabel => !IsEmpty && Tokens[0].Id == TokenId.LABEL;
+
+    /// <summary>
     /// Gets a collection of all tokens in the line.
     /// </summary>
     public IReadOnlyList<Token> Tokens { get; }

@@ -11,6 +11,10 @@ mov $reg1 0x0000
 ldl $reg0 .p2:8
 ldh $reg0 .p10..p17
 
+ldp $acc .p2:8
+msl $acc $acc 8
+ldp $acc .p2:8
+
 bne loop $reg0 $reg1
 
 ; sph - set pin(s) high - sph .p0

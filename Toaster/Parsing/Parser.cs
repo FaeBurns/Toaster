@@ -35,6 +35,8 @@ public class Parser
         // offsetIndex is used to define the index of the line in an instruction-only context
         int offsetIndex = 0;
 
+        int lastInstructionIndex = -1;
+
         // parse each line
         for (int i = 0; i < lines.Length; i++)
         {
@@ -43,11 +45,14 @@ public class Parser
             // if the newly parsed line is an instruction
             // increment offsetIndex
             if (tokenLines[i].IsInstruction)
+            {
                 offsetIndex++;
+                lastInstructionIndex = i;
+            }
         }
 
         // construct result and return
-        return new TokenProgram(tokenLines);
+        return new TokenProgram(tokenLines, lines, lastInstructionIndex);
     }
 
     private TokenLine ParseLine(string line, int lineIndex, int offsetIndex)
@@ -104,7 +109,7 @@ public class Parser
             // if no match was found
             else
             {
-                Errors.RaiseError("Unable to parse remainder of line", lineIndex, startPosition);
+                Errors.RaiseError("Unable to parse remainder of line", lineIndex, startPosition, line.Length - 1);
             }
         }
 

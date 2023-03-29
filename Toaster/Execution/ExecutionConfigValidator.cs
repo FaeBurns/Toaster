@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace Toaster.Execution;
@@ -85,6 +86,7 @@ public class ExecutionConfigValidator
     }
 }
 
+[ExcludeFromCodeCoverage]
 public class ValidationError
 {
     public string Message { get; }

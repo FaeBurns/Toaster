@@ -44,8 +44,12 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="Execution\ExecutionConfigValidationTests.cs" />
+        <Compile Include="Execution\InstructionTests.cs" />
         <Compile Include="Parsing\ParserTests.cs" />
+        <Compile Include="Parsing\TokenValidatorTests.cs" />
+        <Compile Include="Parsing\ValueExtractorTests.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="TestHelpers.cs" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\Toaster\Toaster.csproj">

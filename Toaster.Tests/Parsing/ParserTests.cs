@@ -100,7 +100,7 @@ public class ParserTests
         Assert.AreEqual(Array.Empty<TokenId>(), types[1]);
         Assert.AreEqual(new [] {TokenId.INSTRUCTION, TokenId.REGISTER, TokenId.REGISTER}, types[2]);
         Assert.AreEqual(new [] {TokenId.INSTRUCTION, TokenId.PIN, TokenId.PIN_RANGE, TokenId.PIN_RANGE_LENGTH}, types[3]);
-        Assert.AreEqual(new [] {TokenId.INSTRUCTION, TokenId.NAME, TokenId.HEX, TokenId.INTEGER, TokenId.BINARY, TokenId.COMMENT}, types[4]);
+        Assert.AreEqual(new [] {TokenId.INSTRUCTION, TokenId.LABEL_ARG, TokenId.HEX, TokenId.INTEGER, TokenId.BINARY, TokenId.COMMENT}, types[4]);
         Assert.AreEqual(Array.Empty<TokenId>(), types[5]);
         Assert.AreEqual(new [] {TokenId.COMMENT}, types[6]);
     }
