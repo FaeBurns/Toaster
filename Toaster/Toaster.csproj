@@ -43,7 +43,6 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="Definition\DefinitionParameterFlag.cs" />
-        <Compile Include="Definition\FlagsEnumConverter.cs" />
         <Compile Include="Definition\InstructionDefinition.cs" />
         <Compile Include="Definition\InstructionManager.cs" />
         <Compile Include="Definition\JsonInstructionDefinition.cs" />
@@ -86,19 +85,20 @@
         <Compile Include="Parsing\TokenLine.cs" />
         <Compile Include="Parsing\TokenPosition.cs" />
         <Compile Include="Parsing\TokenProgram.cs" />
-        <Compile Include="Parsing\TokenReaders\ConstantTokenValidator.cs" />
-        <Compile Include="Parsing\TokenReaders\LabelArgumentTokenValidator.cs" />
-        <Compile Include="Parsing\TokenReaders\MultiPinTokenValidator.cs" />
-        <Compile Include="Parsing\TokenReaders\SinglePinTokenValidator.cs" />
+        <Compile Include="Parsing\TokenProgramValidator.cs" />
+        <Compile Include="Parsing\TokenValidators\ConstantTokenValidator.cs" />
+        <Compile Include="Parsing\TokenValidators\LabelArgumentTokenValidator.cs" />
+        <Compile Include="Parsing\TokenValidators\MultiPinTokenValidator.cs" />
+        <Compile Include="Parsing\TokenValidators\SinglePinTokenValidator.cs" />
         <Compile Include="Parsing\TokenRule.cs" />
         <Compile Include="Parsing\TokenRuleAttribute.cs" />
         <Compile Include="Parsing\TokenId.cs" />
-        <Compile Include="Parsing\TokenReaders\DiscardedTokenValidator.cs" />
-        <Compile Include="Parsing\TokenReaders\LabelTokenValidator.cs" />
-        <Compile Include="Parsing\TokenReaders\RegisterTokenValidator.cs" />
-        <Compile Include="Parsing\TokenReaders\TokenValidator.cs" />
-        <Compile Include="Parsing\TokenReaders\TokenValidationContext.cs" />
-        <Compile Include="Parsing\TokenReaders\TokenValidatorSelector.cs" />
+        <Compile Include="Parsing\TokenValidators\DiscardedTokenValidator.cs" />
+        <Compile Include="Parsing\TokenValidators\LabelTokenValidator.cs" />
+        <Compile Include="Parsing\TokenValidators\RegisterTokenValidator.cs" />
+        <Compile Include="Parsing\TokenValidators\TokenValidator.cs" />
+        <Compile Include="Parsing\TokenValidators\TokenValidationContext.cs" />
+        <Compile Include="Parsing\TokenValidators\TokenValidatorSelector.cs" />
         <Compile Include="Parsing\ValueExtractors\ConstantValueExtractor.cs" />
         <Compile Include="Parsing\ValueExtractors\MultiplePinValueExtractor.cs" />
         <Compile Include="Parsing\ValueExtractors\SinglePinValueExtractor.cs" />

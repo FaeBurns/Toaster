@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-
-namespace Toaster.Parsing;
+﻿namespace Toaster.Parsing;
 
 /// <summary>
 /// A class responsible for defining a token's position in the program

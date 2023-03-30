@@ -1,11 +1,7 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Net;
 using System.Reflection;
-using System.Resources;
 using Newtonsoft.Json;
 using Toaster.Instructions;
 using Toaster.Parsing;
@@ -22,8 +18,6 @@ public static class InstructionManager
     /// <param name="jsonText">The json to load the signatures from.</param>
     public static void LoadSignatures(string jsonText)
     {
-        Debug.Assert(_definitions.Count == 0);
-
         JsonInstructionDefinitionCollection definitionCollection = JsonConvert.DeserializeObject<JsonInstructionDefinitionCollection>(jsonText)!;
 
         foreach (JsonInstructionDefinition jsonDefinition in definitionCollection.Definitions)

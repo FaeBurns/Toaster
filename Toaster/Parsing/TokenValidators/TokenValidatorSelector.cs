@@ -4,7 +4,7 @@ namespace Toaster.Parsing.TokenReaders;
 
 public static class TokenValidatorSelector
 {
-    public static TokenValidator GetReader(TokenId tokenId)
+    public static TokenValidator GetValidator(TokenId tokenId)
     {
         switch (tokenId)
         {
