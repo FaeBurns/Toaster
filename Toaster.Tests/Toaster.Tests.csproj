@@ -43,6 +43,7 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Definition\InstructionManagerTests.cs" />
         <Compile Include="Execution\ExecutionConfigValidationTests.cs" />
         <Compile Include="Execution\InstructionTests.cs" />
         <Compile Include="Parsing\ParserTests.cs" />

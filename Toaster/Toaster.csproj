@@ -33,12 +33,21 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
+        <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+          <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+        </Reference>
         <Reference Include="System" />
         <Reference Include="System.Core" />
         <Reference Include="System.Data" />
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Definition\DefinitionParameterFlag.cs" />
+        <Compile Include="Definition\FlagsEnumConverter.cs" />
+        <Compile Include="Definition\InstructionDefinition.cs" />
+        <Compile Include="Definition\InstructionManager.cs" />
+        <Compile Include="Definition\JsonInstructionDefinition.cs" />
+        <Compile Include="Definition\JsonInstructionDefinitionCollection.cs" />
         <Compile Include="Execution\ExecutionConfig.cs" />
         <Compile Include="Execution\ExecutionConfigValidator.cs" />
         <Compile Include="Execution\FlowController.cs" />
@@ -102,9 +111,18 @@
         <Compile Include="ErrorCollection.cs" />
     </ItemGroup>
     <ItemGroup>
+      <Content Include="Definition\definitions_schema.json" />
       <Content Include="sample\passthrough.tst" />
       <Content Include="sample\token_zoo.tst" />
       <Content Include="sample\zoo.tst" />
+    </ItemGroup>
+    <ItemGroup>
+      <None Include="packages.config" />
+    </ItemGroup>
+    <ItemGroup>
+      <None Include="Definition\instructions.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

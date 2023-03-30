@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using Toaster.Definition;
 using Toaster.Instructions;
 using Toaster.Parsing;
 using Toaster.Parsing.ValueExtractors;
@@ -28,7 +30,13 @@ public class LineExecutor
 
         IEnumerable<Token> argumentTokens = line.Tokens.Skip(1);
 
-        throw new NotImplementedException();
+        Instruction instruction = InstructionManager.TryFetchInstructionBySignature(instructionName, argumentTokens.Select(t => t.Id).ToArray());
+
+        // should never have got to this point if no instruction can be found here
+        // execution should never have begun
+        Debug.Assert(instruction != null);
+
+        return instruction;
     }
 
     public void Execute(TokenLine line)

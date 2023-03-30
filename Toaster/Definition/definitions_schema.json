@@ -1,0 +1,60 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "Interpreter/definitions_schema.json",
+  "title": "Instruction Definition Collection",
+  "description": "A collection of instruction definitions",
+  "type": "object",
+  "properties": {
+
+    "namespace": {
+      "description": "A namespace prefix to apply to all instruction types",
+      "type": "string",
+      "pattern": "^[a-zA-Z.]+$"
+    },
+
+    "type-postfix": {
+      "description": "A type postfix to apply to all instruction types",
+      "type": "string"
+    },
+
+    "definitions": {
+      "description": "The array of definitions",
+      "type": "array",
+      "items": {
+        "description": "An instruction definition",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-zA-Z]+$"
+          },
+          "instruction-type": {
+            "type": "string"
+          },
+          "parameters": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": ["REGISTER", "LABEL", "CONSTANT", "PIN_SINGLE", "PIN_MULTIPLE", "REGISTER_CONSTANT", "REGISTER_CONSTANT_LABEL", "PIN_ALL"],
+                  "uniqueItems": true
+                },
+                {
+                  "type": "enum",
+                  "items": {
+                    "type": "string",
+                    "enum": ["REGISTER", "LABEL", "CONSTANT", "PIN_SINGLE", "PIN_MULTIPLE", "REGISTER_CONSTANT", "REGISTER_CONSTANT_LABEL", "PIN_ALL"],
+                    "uniqueItems": true
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "required": ["name", "instruction-type", "parameters"]
+      }
+    }
+  },
+  "required": [ "namespace", "type-postfix", "definitions" ]
+}
