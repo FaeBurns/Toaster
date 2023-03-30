@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using Toaster.Execution;
 using Toaster.Parsing;
@@ -49,5 +50,21 @@ public class InterpreterTests
 
         interpreter.Step();
         TestRegister(interpreter, "acc", 1);
+    }
+
+    [Test]
+    public void Add_Overflow()
+    {
+        string program = "add " + UInt16.MaxValue + "\nadd " + 5;
+
+        TokenProgram parsedProgram = new Parser().Tokenize(program);
+
+        Interpreter interpreter = new Interpreter(GetGenericConfig(), parsedProgram);
+
+        interpreter.Step();
+        TestRegister(interpreter, "acc", UInt16.MaxValue);
+
+        interpreter.Step();
+        TestRegister(interpreter, "acc", 4);
     }
 }

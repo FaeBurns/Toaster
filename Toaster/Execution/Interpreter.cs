@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Toaster.Parsing;
 
 namespace Toaster.Execution;
@@ -9,28 +8,22 @@ public class Interpreter : IExecutionContext
 {
     private readonly ExecutionConfig _config;
     private readonly TokenProgram _tokenProgram;
+    private readonly FlowController _flowController;
+    private readonly bool[] _pins;
     private readonly Dictionary<string, ushort> _registerValues = new Dictionary<string, ushort>();
-    private readonly Stack<ushort[]> _savedStackRegisters = new Stack<ushort[]>();
-
-    /// <summary>
-    /// Gets the index of the next line to be executed. A value less than 0 means that no execution will occur.
-    /// </summary>
-    public int NextLineIndex { get; private set; }
-
-    /// <summary>
-    /// Gets the index of the currently executing/just executed line of the program.
-    /// </summary>
-    public int CurrentLineIndex { get; private set; }
+    private readonly Stack<StackFrame> _stack = new Stack<StackFrame>();
 
     /// <summary>
     /// Gets the current depth of the stack.
     /// </summary>
-    public int StackDepth => _savedStackRegisters.Count;
+    public int StackDepth => _stack.Count;
 
     public Interpreter(ExecutionConfig config, TokenProgram tokenProgram)
     {
         _config = config;
         _tokenProgram = tokenProgram;
+        _flowController = new FlowController(tokenProgram);
+        _pins = new bool[config.PinCount];
 
         ExecutionConfigValidator validator = new ExecutionConfigValidator(config);
         validator.Validate();
@@ -48,41 +41,63 @@ public class Interpreter : IExecutionContext
     {
         // if next line index is invalid
         // either EOF or invalid jump occured so exit
-        if (NextLineIndex < 0)
+        if (_flowController.NextLineIndex < 0)
             return;
 
-        CurrentLineIndex = NextLineIndex;
+        // update the current line index
+        _flowController.UpdateCurrent();
 
-        TokenLine tokenLine = _tokenProgram.Lines[CurrentLineIndex];
+        // get the TokenLine for the current line
+        TokenLine tokenLine = _tokenProgram.Lines[_flowController.CurrentLineIndex];
+
+        // if this line is an instruction
+        if (tokenLine.IsInstruction)
+        {
+            // execute the line
+            LineExecutor executor = new LineExecutor(this);
+            executor.Execute(tokenLine);
+        }
+
+        // if the flow controller was not modified
+        // move to the next line
+        if (!_flowController.Modified)
+            _flowController.MoveNext();
+
+        // reset flow controller information
+        _flowController.Reset();
     }
 
     public void PushFrame()
     {
-        ushort[] frame = new ushort[_config.StackRegisterCount];
+        int returnIndex = _flowController.CurrentLineIndex + 1;
+        StackFrame frame = new StackFrame(_config.StackRegisterCount, returnIndex);
+
         for (int i = 0; i < _config.StackRegisterCount; i++)
         {
-            frame[i] = _registerValues["s" + i];
+            frame.Registers[i] = _registerValues["s" + i];
         }
-        _savedStackRegisters.Push(frame);
+        _stack.Push(frame);
     }
 
-    public void PopFrame()
+    public int PopFrame()
     {
-        ushort[] frame = _savedStackRegisters.Pop();
+        StackFrame frame = _stack.Pop();
         for (int i = 0; i < _config.StackRegisterCount; i++)
         {
-            _registerValues["s" + i] = frame[i];
+            _registerValues["s" + i] = frame.Registers[i];
         }
+
+        return frame.ReturnLineIndex;
     }
 
-    public void Jump(string label)
+    public ushort GetLabelLineIndex(string label)
     {
-        Jump(TryFindLabel(label));
+        return (ushort)_flowController.TryFindLabel(label);
     }
 
     public void Jump(int lineNumber)
     {
-        NextLineIndex = GetNextExecutingLineIndex(lineNumber);
+        _flowController.Jump(lineNumber);
     }
 
     /// <summary>
@@ -107,6 +122,34 @@ public class Interpreter : IExecutionContext
         _registerValues[registerName] = value;
     }
 
+    public void SetPin(int pin, bool value)
+    {
+        _pins[pin] = value;
+    }
+
+    public void SetPins(int startPin, bool[] values)
+    {
+        for (int i = 0; i < values.Length; i++)
+        {
+            _pins[startPin + i] = values[i];
+        }
+    }
+
+    public bool GetPin(int pin)
+    {
+        return _pins[pin];
+    }
+
+    public bool[] GetPins(int startPin, int count)
+    {
+        bool[] result = new bool[count];
+        for (int i = 0; i < result.Length; i++)
+        {
+            result[i] = _pins[startPin + i];
+        }
+        return result;
+    }
+
     /// <summary>
     /// Gets a readonly view of the registers and their values
     /// </summary>
@@ -114,39 +157,6 @@ public class Interpreter : IExecutionContext
     public IReadOnlyDictionary<string, ushort> GetRegisterValues()
     {
         return _registerValues;
-    }
-
-    /// <summary>
-    /// Tries to find a label in the program.
-    /// </summary>
-    /// <param name="label">The label to find.</param>
-    /// <returns>The line index of the first instruction after the label. -1 if no match was found.</returns>
-    public int TryFindLabel(string label)
-    {
-        foreach (TokenLine line in _tokenProgram.Lines)
-        {
-            if (line.IsLabel && line.Tokens[0].RegexResult.Groups[1].Value == label)
-                return GetNextExecutingLineIndex(line.LineIndex);
-        }
-
-        return -1;
-    }
-
-    private int GetNextExecutingLineIndex(int startLineIndex)
-    {
-        if (startLineIndex < 0)
-            return -1;
-
-        if (startLineIndex > _tokenProgram.LastInstructionIndex)
-            return -1;
-
-        for (int i = startLineIndex; i <= _tokenProgram.LastInstructionIndex; i++)
-        {
-            if (_tokenProgram.Lines[i].IsInstruction)
-                return i;
-        }
-
-        return -1;
     }
 
     private void CreateRegisters()

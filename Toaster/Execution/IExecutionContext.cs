@@ -3,7 +3,11 @@
 public interface IExecutionContext
 {
     public void PushFrame();
-    public void PopFrame();
-    public void Jump(string label);
+    public int PopFrame();
     public void Jump(int lineIndex);
+    public ushort GetLabelLineIndex(string label);
+    public ushort GetRegisterValue(string register);
+    public void SetRegisterValue(string register, ushort value);
+    public void SetPins(int startPin, bool[] values);
+    public bool[] GetPins(int startPin, int count);
 }

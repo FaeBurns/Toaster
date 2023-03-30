@@ -79,4 +79,10 @@ public class ErrorCollection
     {
         Raise(message, position, ErrorLevel.INFO);
     }
+
+    public void Clear()
+    {
+        HighestErrorLevel = ErrorLevel.INFO;
+        _errors.Clear();
+    }
 }
