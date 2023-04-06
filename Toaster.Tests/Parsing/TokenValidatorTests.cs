@@ -1,7 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using Toaster.Parsing;
-using Toaster.Parsing.TokenReaders;
+using Toaster.Parsing.TokenValidators;
 
 namespace Toaster.Tests.Parsing;
 

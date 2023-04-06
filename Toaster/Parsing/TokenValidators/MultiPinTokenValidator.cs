@@ -1,7 +1,7 @@
 ﻿using System;
 using Toaster.Parsing.ValueExtractors;
 
-namespace Toaster.Parsing.TokenReaders;
+namespace Toaster.Parsing.TokenValidators;
 
 public class MultiPinTokenValidator : TokenValidator
 {

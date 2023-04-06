@@ -1,7 +1,7 @@
 ﻿using System;
 using Toaster.Parsing.ValueExtractors;
 
-namespace Toaster.Parsing.TokenReaders;
+namespace Toaster.Parsing.TokenValidators;
 
 public class ConstantTokenValidator : TokenValidator
 {
@@ -11,7 +11,7 @@ public class ConstantTokenValidator : TokenValidator
         {
             _ = ValueExtractorSource.ConstantExtractor.ExtractValue(token);
         }
-        catch (OverflowException e)
+        catch (OverflowException)
         {
             string maxValue = token.Id switch
             {

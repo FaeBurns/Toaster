@@ -53,6 +53,8 @@
         <Compile Include="Execution\IExecutionContext.cs" />
         <Compile Include="Execution\Interpreter.cs" />
         <Compile Include="Execution\LineExecutor.cs" />
+        <Compile Include="Execution\PinController.cs" />
+        <Compile Include="Execution\RegisterController.cs" />
         <Compile Include="Execution\StackFrame.cs" />
         <Compile Include="Instructions\Branch\BranchAreEqualInstruction.cs" />
         <Compile Include="Instructions\Branch\BranchGreaterThanInstruction.cs" />

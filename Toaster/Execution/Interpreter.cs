@@ -9,8 +9,8 @@ public class Interpreter : IExecutionContext
     private readonly ExecutionConfig _config;
     private readonly TokenProgram _tokenProgram;
     private readonly FlowController _flowController;
-    private readonly bool[] _pins;
-    private readonly Dictionary<string, ushort> _registerValues = new Dictionary<string, ushort>();
+    private readonly RegisterController _registerController;
+    private readonly PinController _pinController;
     private readonly Stack<StackFrame> _stack = new Stack<StackFrame>();
 
     /// <summary>
@@ -20,18 +20,18 @@ public class Interpreter : IExecutionContext
 
     public Interpreter(ExecutionConfig config, TokenProgram tokenProgram)
     {
-        _config = config;
-        _tokenProgram = tokenProgram;
-        _flowController = new FlowController(tokenProgram);
-        _pins = new bool[config.PinCount];
-
+        // validate config before setup
         ExecutionConfigValidator validator = new ExecutionConfigValidator(config);
         validator.Validate();
 
         if (validator.HasErrors)
             throw new ArgumentException($"validation of argument {config} shows errors", nameof(config));
 
-        CreateRegisters();
+        _config = config;
+        _tokenProgram = tokenProgram;
+        _flowController = new FlowController(tokenProgram);
+        _registerController = new RegisterController(config);
+        _pinController = new PinController(config.PinCount);
     }
 
     /// <summary>
@@ -74,7 +74,7 @@ public class Interpreter : IExecutionContext
 
         for (int i = 0; i < _config.StackRegisterCount; i++)
         {
-            frame.Registers[i] = _registerValues["s" + i];
+            frame.Registers[i] = _registerController.GetRegister("s" + i);
         }
         _stack.Push(frame);
     }
@@ -84,7 +84,7 @@ public class Interpreter : IExecutionContext
         StackFrame frame = _stack.Pop();
         for (int i = 0; i < _config.StackRegisterCount; i++)
         {
-            _registerValues["s" + i] = frame.Registers[i];
+            _registerController.SetRegister("s" + i, frame.Registers[i]);
         }
 
         return frame.ReturnLineIndex;
@@ -104,40 +104,38 @@ public class Interpreter : IExecutionContext
     /// Gets the value of the specified register.
     /// </summary>
     /// <param name="registerName">The name of the register to find.</param>
-    /// <returns>The value in the register</returns>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <returns>The value in the register.</returns>
     public ushort GetRegisterValue(string registerName)
     {
-        if (!_registerValues.ContainsKey(registerName))
-            throw new InvalidOperationException("Cannot get value of register that does not exist");
-
-        return _registerValues[registerName];
+        return _registerController.GetRegister(registerName);
     }
 
+    /// <summary>
+    /// Sets the value of the specified register.
+    /// </summary>
+    /// <param name="registerName">The name of the register to find.</param>
+    /// <param name="value">The value to set the register to.</param>
     public void SetRegisterValue(string registerName, ushort value)
     {
-        if (!_registerValues.ContainsKey(registerName))
-            throw new InvalidOperationException($"Cannot set value of register that does not exist");
-
-        _registerValues[registerName] = value;
+        _registerController.SetRegister(registerName, value);
     }
 
     public void SetPin(int pin, bool value)
     {
-        _pins[pin] = value;
+        _pinController.SetIndexedPinValue(pin, value);
     }
 
     public void SetPins(int startPin, bool[] values)
     {
         for (int i = 0; i < values.Length; i++)
         {
-            _pins[startPin + i] = values[i];
+            _pinController.SetIndexedPinValue(startPin + i, values[i]);
         }
     }
 
     public bool GetPin(int pin)
     {
-        return _pins[pin];
+        return _pinController.GetIndexedPinValue(pin);
     }
 
     public bool[] GetPins(int startPin, int count)
@@ -145,7 +143,7 @@ public class Interpreter : IExecutionContext
         bool[] result = new bool[count];
         for (int i = 0; i < result.Length; i++)
         {
-            result[i] = _pins[startPin + i];
+            result[i] = _pinController.GetIndexedPinValue(startPin + i);
         }
         return result;
     }
@@ -156,31 +154,12 @@ public class Interpreter : IExecutionContext
     /// <returns></returns>
     public IReadOnlyDictionary<string, ushort> GetRegisterValues()
     {
-        return _registerValues;
-    }
-
-    private void CreateRegisters()
-    {
-        // add guaranteed registers
-        _registerValues.Add("acc", 0);
-        _registerValues.Add("t", 0);
-        _registerValues.Add("ra", 0);
-        _registerValues.Add("rv", 0);
-
-        // create from config
-        for (int i = 0; i < _config.BasicRegisterCount; i++)
+        Dictionary<string, ushort> values = new Dictionary<string, ushort>();
+        foreach (string name in _registerController.GetUsedRegisterNames())
         {
-            _registerValues.Add("r" + i, 0);
+            values.Add(name, _registerController.GetRegister(name));
         }
 
-        for (int i = 0; i < _config.StackRegisterCount; i++)
-        {
-            _registerValues.Add("s" + i, 0);
-        }
-
-        foreach (string namedRegister in _config.NamedRegisters)
-        {
-            _registerValues.Add(namedRegister, 0);
-        }
+        return values;
     }
 }

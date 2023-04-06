@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Toaster.Parsing.TokenReaders;
+namespace Toaster.Parsing.TokenValidators;
 
 public static class TokenValidatorSelector
 {

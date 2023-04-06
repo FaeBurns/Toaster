@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Toaster.Parsing.TokenReaders;
+namespace Toaster.Parsing.TokenValidators;
 
 public class TokenValidationContext
 {

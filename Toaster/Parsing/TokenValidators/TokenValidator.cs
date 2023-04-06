@@ -1,4 +1,4 @@
-﻿namespace Toaster.Parsing.TokenReaders;
+﻿namespace Toaster.Parsing.TokenValidators;
 
 public abstract class TokenValidator
 {
