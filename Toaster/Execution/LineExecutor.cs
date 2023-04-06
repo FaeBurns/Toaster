@@ -18,7 +18,7 @@ public class LineExecutor
         _context = context;
     }
 
-    public ErrorCollection Errors { get; } = new ErrorCollection();
+    public ErrorCollection ErrorCollection { get; } = new ErrorCollection();
 
     private Instruction GetInstruction(TokenLine line)
     {
@@ -39,7 +39,12 @@ public class LineExecutor
         return instruction;
     }
 
-    public void Execute(TokenLine line)
+    /// <summary>
+    /// Executes the line.
+    /// </summary>
+    /// <param name="line">The line to execute.</param>
+    /// <returns>True if execution was okay, False if errors were found.</returns>
+    public bool Execute(TokenLine line)
     {
         try
         {
@@ -50,7 +55,7 @@ public class LineExecutor
             Token[] arguments = new Token[line.Tokens.Count - 1];
             for (int i = 0; i < arguments.Length; i++)
             {
-                arguments[0] = line.Tokens[i + 1];
+                arguments[i] = line.Tokens[i + 1];
             }
 
             // execute instruction
@@ -58,8 +63,10 @@ public class LineExecutor
         }
         catch (Exception e)
         {
-            Errors.Raise(e.Message, line.LineIndex, 0, line.FullLine.Length - 1, ErrorLevel.ERROR);
+            ErrorCollection.Raise(e.Message, line.LineIndex, 0, line.FullLine.Length - 1, ErrorLevel.ERROR);
         }
+
+        return ErrorCollection.IsEmpty;
     }
 }
 

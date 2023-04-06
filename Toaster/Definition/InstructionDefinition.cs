@@ -18,4 +18,21 @@ public class InstructionDefinition
     public readonly DefinitionParameterFlag[] Parameters;
 
     public readonly Instruction Instruction;
+
+    public string GetPrettyPrint()
+    {
+        string parametersString = "";
+
+        foreach (DefinitionParameterFlag parameterFlag in Parameters)
+        {
+            parametersString += parameterFlag;
+        }
+
+        return $"{Name} {parametersString}";
+    }
+
+    public override string ToString()
+    {
+        return GetPrettyPrint();
+    }
 }

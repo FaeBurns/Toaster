@@ -1,38 +1,47 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Toaster.Definition;
 using Toaster.Execution;
+using Toaster.Instructions;
 using Toaster.Parsing.TokenValidators;
+using Toaster.Parsing.ValueExtractors;
 
 namespace Toaster.Parsing;
 
 public class TokenProgramValidator
 {
-    public ErrorCollection Errors { get; } = new ErrorCollection();
+    public ErrorCollection ErrorCollection { get; } = new ErrorCollection();
 
     public void Validate(TokenProgram program, ExecutionConfig validationTarget)
     {
         // get all register names and create validationContext
-        List<string> registers = GetRegisterNames(validationTarget);
+        string[] registers = RegisterController.GetRegisterNames(validationTarget);
         TokenValidationContext validationContext = new TokenValidationContext(registers);
 
         PreprocessLabels(program, validationContext);
 
         foreach (TokenLine tokenLine in program.Lines)
         {
-            // if line is an instruction line
-            // then its tokens should be validated
-            if (tokenLine.IsInstruction)
-            {
-                foreach (Token token in tokenLine.Tokens)
-                {
-                    // get validator for token
-                    TokenValidator validator = TokenValidatorSelector.GetValidator(token.Id);
+            ValidateLine(tokenLine, validationContext);
+        }
+    }
 
-                    // set error target
-                    // and validate
-                    validator.Errors = Errors;
-                    validator.Validate(token, validationContext);
-                }
-            }
+    private void ValidateLine(TokenLine tokenLine, TokenValidationContext validationContext)
+    {
+        foreach (Token token in tokenLine.Tokens)
+        {
+            // validate if instruction
+            if (token.Id == TokenId.INSTRUCTION)
+                ValidateSignature(tokenLine);
+
+            // get validator for token
+            TokenValidator validator = TokenValidatorSelector.GetValidator(token.Id);
+
+            // set error target
+            // and validate
+            validator.Errors = ErrorCollection;
+            validator.Validate(token, validationContext);
         }
     }
 
@@ -49,24 +58,45 @@ public class TokenProgramValidator
         }
     }
 
-    private static List<string> GetRegisterNames(ExecutionConfig validationTarget)
+    /// <summary>
+    /// Validates a <see cref="TokenLine"/> holding an instruction line. Only performs validation on the signature of the instruction line, does not check if arguments are valid.
+    /// </summary>
+    /// <param name="instructionLine"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException">Input was not an instruction line.</exception>
+    private void ValidateSignature(TokenLine instructionLine)
     {
-        List<string> registers = new List<string>(validationTarget.NamedRegisters)
+        if (!instructionLine.IsInstruction)
+            throw new ArgumentException($"input {nameof(TokenLine)} must be an instruction line", nameof(instructionLine));
+
+        StringValueExtractor instructionExtractor = new StringValueExtractor();
+        string instructionName = instructionExtractor.ExtractValue(instructionLine.Tokens[0]);
+
+        // get all instructions but the first
+        IEnumerable<Token> argumentTokens = instructionLine.Tokens.Skip(1);
+
+        // try and get instruction
+        Instruction instruction = InstructionManager.TryFetchInstructionBySignature(instructionName, argumentTokens.Select(t => t.Id).ToArray());
+
+        // return okay if instruction was found
+        if (instruction != null)
+            return;
+
+        if (!InstructionManager.GetHasInstructionWithName(instructionName))
         {
-            "acc",
-            "t",
-            "ra",
-            "rv",
-        };
-        for (int i = 0; i < validationTarget.BasicRegisterCount; i++)
-        {
-            registers.Add("r" + i);
+            ErrorCollection.RaiseError($"Cannot find instruction with name {instructionName}", instructionLine.LineIndex, 0, instructionLine.FullLine.Length);
+            return;
         }
 
-        for (int i = 0; i < validationTarget.StackRegisterCount; i++)
+        IEnumerable<InstructionDefinition> definitions = InstructionManager.GetDefinitions(instructionName);
+
+        string validDefinitionsString = "";
+
+        foreach (InstructionDefinition definition in definitions)
         {
-            registers.Add("s" + i);
+            validDefinitionsString += definition.ToString();
         }
-        return registers;
+
+        ErrorCollection.RaiseError($"Could not find valid override for {instructionName}. Valid overrides:\n{validDefinitionsString}", instructionLine.LineIndex, 0, instructionLine.FullLine.Length);
     }
 }

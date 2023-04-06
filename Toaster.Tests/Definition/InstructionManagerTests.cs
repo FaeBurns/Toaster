@@ -27,7 +27,7 @@ public class InstructionManagerTests
     [Test]
     public void TryFetch_UnknownOverload()
     {
-        AssertFetches<AddInstruction>("add", TokenId.REGISTER, TokenId.LABEL_ARG);
+        Assert.Throws<AssertionException>(() => AssertFetches<AddInstruction>("add", TokenId.REGISTER, TokenId.LABEL_ARG));
     }
 
     [Test]

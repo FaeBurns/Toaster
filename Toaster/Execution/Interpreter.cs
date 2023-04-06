@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Toaster.Instructions;
 using Toaster.Parsing;
 
 namespace Toaster.Execution;
@@ -12,6 +14,11 @@ public class Interpreter : IExecutionContext
     private readonly RegisterController _registerController;
     private readonly PinController _pinController;
     private readonly Stack<StackFrame> _stack = new Stack<StackFrame>();
+
+    /// <summary>
+    /// Gets the <see cref="ErrorCollection"/> that is populated by errors achieved during execution.
+    /// </summary>
+    public ErrorCollection InstructionErrorCollection { get; } = new ErrorCollection();
 
     /// <summary>
     /// Gets the current depth of the stack.
@@ -56,6 +63,12 @@ public class Interpreter : IExecutionContext
             // execute the line
             LineExecutor executor = new LineExecutor(this);
             executor.Execute(tokenLine);
+
+            // if execution failed, copy all errors to InstructionErrorCollection
+            foreach (Error error in executor.ErrorCollection.Errors)
+            {
+                InstructionErrorCollection.Raise(error);
+            }
         }
 
         // if the flow controller was not modified

@@ -55,20 +55,47 @@ public static class InstructionManager
                 if (foundDefinition.Parameters.Length != signatureArgumentIds.Length)
                     continue;
 
+                // start off as true so can be set to false if issue is found
+                bool isMatch = true;
+
                 for (int i = 0; i < foundDefinition.Parameters.Length; i++)
                 {
                     DefinitionParameterFlag definitionFlag = foundDefinition.Parameters[i];
                     DefinitionParameterFlag argumentFlag = signatureArgumentIds[i];
 
-                    // if the and result has at least one bit set
-                    if ((definitionFlag & argumentFlag) != 0)
-                        return foundDefinition.Instruction;
+                    // if the and result have no bits set
+                    // then there is no match for this argument, and the signature is not a match
+                    if ((definitionFlag & argumentFlag) == 0)
+                        isMatch = false;
                 }
+
+                if (isMatch)
+                    return foundDefinition.Instruction;
             }
         }
 
         // nothing valid was found
         return null;
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether there is an instruction accessible by the provided name.
+    /// </summary>
+    /// <param name="name">The name of the instruction.</param>
+    /// <returns>True if there is an instruction, false if not.</returns>
+    public static bool GetHasInstructionWithName(string name)
+    {
+        return _definitions.ContainsKey(name);
+    }
+
+    /// <summary>
+    /// Gets a collection of all <see cref="InstructionDefinition">InstructionDefinitions</see> associated with a specific instruction. Assumes <paramref name="instructionName"/> is valid.
+    /// </summary>
+    /// <param name="instructionName">The name of the instruction to get the definitions for.</param>
+    /// <returns>A collection of all the instruction's definitions.</returns>
+    public static IEnumerable<InstructionDefinition> GetDefinitions(string instructionName)
+    {
+        return _definitions[instructionName];
     }
 
     private static DefinitionParameterFlag ConvertArgumentIdToParameterFlag(TokenId tokenId)
@@ -83,6 +110,7 @@ public static class InstructionManager
             TokenId.BINARY => DefinitionParameterFlag.CONSTANT,
             TokenId.HEX => DefinitionParameterFlag.CONSTANT,
             TokenId.INTEGER => DefinitionParameterFlag.CONSTANT,
+            TokenId.COMMENT => throw new ArgumentException($"Argument cannot be of type {nameof(TokenId.COMMENT)}", nameof(tokenId)),
             _ => throw new ArgumentOutOfRangeException(nameof(tokenId), tokenId, null),
         };
     }

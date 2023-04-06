@@ -84,7 +84,7 @@ public class ParserTests
         string programText = ReadSampleFile("token_zoo.tst");
 
         Parser parser = new Parser();
-        TokenProgram tokenProgram = parser.Tokenize(programText);
+        TokenProgram tokenProgram = parser.Tokenize(programText, true);
 
         TokenId[][] types = new TokenId[tokenProgram.Lines.Count][];
 
@@ -160,7 +160,7 @@ public class ParserTests
         const string programText = "mov $reg1 name .p0 .p0..p1 .p0:1 0xFF 0 0b0\r\n:label; comment £";
 
         Parser parser = new Parser();
-        TokenProgram program = parser.Tokenize(programText);
+        TokenProgram program = parser.Tokenize(programText, true);
 
         Assert.AreEqual("mov", program.Lines[0].Tokens[0].Value);
         Assert.AreEqual("$reg1", program.Lines[0].Tokens[1].Value);
@@ -181,7 +181,7 @@ public class ParserTests
         string programText = ReadSampleFile("token_zoo.tst");
 
         Parser parser = new Parser();
-        TokenProgram program = parser.Tokenize(programText);
+        TokenProgram program = parser.Tokenize(programText, true);
 
         Assert.IsTrue(program.Lines[4].Tokens[5].IsComment);
         Assert.IsTrue(program.Lines[6].Tokens[0].IsComment);
@@ -198,5 +198,20 @@ public class ParserTests
         Assert.AreEqual("label", program.Lines[0].Tokens[0].RegexResult.Groups[1].Value);
         Assert.AreEqual("0", program.Lines[3].Tokens[2].RegexResult.Groups[1].Value);
         Assert.AreEqual("7", program.Lines[3].Tokens[2].RegexResult.Groups[2].Value);
+    }
+
+    [Test]
+    public void Test_No_Comments()
+    {
+        string programText = ReadSampleFile("token_zoo.tst");
+
+        Parser parser = new Parser();
+        TokenProgram program = parser.Tokenize(programText);
+
+        foreach (TokenLine tokenLine in program.Lines)
+        {
+            if (tokenLine.TokenIds.Contains(TokenId.COMMENT))
+                Assert.Fail("TokenLine contains comment");
+        }
     }
 }

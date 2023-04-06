@@ -9,7 +9,7 @@ namespace Toaster.Parsing;
 public class Parser
 {
     private static readonly TokenRule[] _tokenRules;
-    private static readonly string[] _lineSeparators = new string[3] { "\r\n", "\r", "\n", };
+    private static readonly string[] _lineSeparators = new string[] { "\r\n", "\r", "\n", };
 
     static Parser()
     {
@@ -22,8 +22,9 @@ public class Parser
     /// Tokenizes the provided program string
     /// </summary>
     /// <param name="program">The program to tokenize.</param>
+    /// <param name="includeComments">Should comment tokens be included in the TokenProgram output.</param>
     /// <returns>The tokenized program.</returns>
-    public TokenProgram Tokenize(string program)
+    public TokenProgram Tokenize(string program, bool includeComments = false)
     {
         // split lines without removing empty lines
         string[] lines = program.Split(_lineSeparators, StringSplitOptions.None);
@@ -39,7 +40,7 @@ public class Parser
         // parse each line
         for (int i = 0; i < lines.Length; i++)
         {
-            tokenLines[i] = ParseLine(lines[i], i, offsetIndex);
+            tokenLines[i] = ParseLine(lines[i], i, offsetIndex, includeComments);
 
             // if the newly parsed line is an instruction
             // increment offsetIndex
@@ -54,7 +55,7 @@ public class Parser
         return new TokenProgram(tokenLines, lines, lastInstructionIndex);
     }
 
-    private TokenLine ParseLine(string line, int lineIndex, int offsetIndex)
+    private TokenLine ParseLine(string line, int lineIndex, int offsetIndex, bool includeComments)
     {
         string searchingSection = line;
 
@@ -90,7 +91,14 @@ public class Parser
             // if a match was found
             if (matchingRule != null)
             {
+                // if this is a comment, and comments are being skipped
+                // don't add to tokens list
+                // exit out of the loop and return immediately - comments are always the last token on a line
+                if (matchingRule.IsComment && !includeComments)
+                    break;
+
                 // skip if rule says to discard
+                // or if rule is a comment and this is not including comments
                 if (!matchingRule.IsDiscarded)
                 {
                     // get position of token in program
