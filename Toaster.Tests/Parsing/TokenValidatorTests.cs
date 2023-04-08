@@ -19,12 +19,12 @@ public class TokenValidatorTests
         LabelTokenValidator validator = new LabelTokenValidator();
         validator.Validate(token1, context);
 
-        Assert.IsTrue(validator.Errors.IsOk);
+        Assert.IsTrue(validator.ErrorCollection.IsOk);
 
         validator = new LabelTokenValidator();
         validator.Validate(token2, context);
 
-        Assert.IsTrue(validator.Errors.IsOk);
+        Assert.IsTrue(validator.ErrorCollection.IsOk);
     }
 
     [Test]
@@ -38,12 +38,12 @@ public class TokenValidatorTests
         LabelTokenValidator validator = new LabelTokenValidator();
         validator.Validate(token1, context);
 
-        Assert.IsTrue(validator.Errors.IsOk);
+        Assert.IsTrue(validator.ErrorCollection.IsOk);
 
         validator = new LabelTokenValidator();
         validator.Validate(token2, context);
 
-        Assert.IsFalse(validator.Errors.IsOk, validator.Errors.ToString());
+        Assert.IsFalse(validator.ErrorCollection.IsOk, validator.ErrorCollection.ToString());
     }
 
     [Test]
@@ -59,7 +59,7 @@ public class TokenValidatorTests
         RegisterTokenValidator validator = new RegisterTokenValidator();
         validator.Validate(token, context);
 
-        Assert.IsTrue(validator.Errors.IsOk);
+        Assert.IsTrue(validator.ErrorCollection.IsOk);
     }
 
     [Test]
@@ -75,7 +75,7 @@ public class TokenValidatorTests
         RegisterTokenValidator validator = new RegisterTokenValidator();
         validator.Validate(token, context);
 
-        Assert.IsFalse(validator.Errors.IsOk, validator.Errors.ToString());
+        Assert.IsFalse(validator.ErrorCollection.IsOk, validator.ErrorCollection.ToString());
     }
 
     [Test]
@@ -89,7 +89,7 @@ public class TokenValidatorTests
         LabelArgumentTokenValidator validator = new LabelArgumentTokenValidator();
         validator.Validate(token, context);
 
-        Assert.IsFalse(validator.Errors.IsOk, validator.Errors.ToString());
+        Assert.IsFalse(validator.ErrorCollection.IsOk, validator.ErrorCollection.ToString());
     }
 
     [Test]
@@ -102,7 +102,7 @@ public class TokenValidatorTests
         LabelArgumentTokenValidator validator = new LabelArgumentTokenValidator();
         validator.Validate(token, context);
 
-        Assert.IsTrue(validator.Errors.IsOk);
+        Assert.IsTrue(validator.ErrorCollection.IsOk);
     }
 
     [Test]
@@ -116,7 +116,7 @@ public class TokenValidatorTests
         MultiPinTokenValidator validator = new MultiPinTokenValidator();
         validator.Validate(token, context);
 
-        Assert.IsFalse(validator.Errors.IsOk, validator.Errors.ToString());
+        Assert.IsFalse(validator.ErrorCollection.IsOk, validator.ErrorCollection.ToString());
     }
 
     [Test]
@@ -133,7 +133,7 @@ public class TokenValidatorTests
         MultiPinTokenValidator validator = new MultiPinTokenValidator();
         validator.Validate(token, context);
 
-        Assert.IsFalse(validator.Errors.IsOk, validator.Errors.ToString());
+        Assert.IsFalse(validator.ErrorCollection.IsOk, validator.ErrorCollection.ToString());
     }
 
     [Test]
@@ -147,7 +147,7 @@ public class TokenValidatorTests
         MultiPinTokenValidator validator = new MultiPinTokenValidator();
         validator.Validate(token, context);
 
-        Assert.IsFalse(validator.Errors.IsOk, validator.Errors.ToString());
+        Assert.IsFalse(validator.ErrorCollection.IsOk, validator.ErrorCollection.ToString());
     }
 
     [Test]
@@ -164,7 +164,7 @@ public class TokenValidatorTests
         MultiPinTokenValidator validator = new MultiPinTokenValidator();
         validator.Validate(token, context);
 
-        Assert.IsTrue(validator.Errors.IsOk, validator.Errors.ToString());
+        Assert.IsTrue(validator.ErrorCollection.IsOk, validator.ErrorCollection.ToString());
     }
 
     [Test]
@@ -177,7 +177,7 @@ public class TokenValidatorTests
         SinglePinTokenValidator validator = new SinglePinTokenValidator();
         validator.Validate(token, context);
 
-        Assert.IsFalse(validator.Errors.IsOk, validator.Errors.ToString());
+        Assert.IsFalse(validator.ErrorCollection.IsOk, validator.ErrorCollection.ToString());
     }
 
     [Test]
@@ -193,7 +193,7 @@ public class TokenValidatorTests
         SinglePinTokenValidator validator = new SinglePinTokenValidator();
         validator.Validate(token, context);
 
-        Assert.IsFalse(validator.Errors.IsOk, validator.Errors.ToString());
+        Assert.IsFalse(validator.ErrorCollection.IsOk, validator.ErrorCollection.ToString());
     }
 
     [Test]
@@ -209,7 +209,7 @@ public class TokenValidatorTests
         SinglePinTokenValidator validator = new SinglePinTokenValidator();
         validator.Validate(token, context);
 
-        Assert.IsTrue(validator.Errors.IsOk, validator.Errors.ToString());
+        Assert.IsTrue(validator.ErrorCollection.IsOk, validator.ErrorCollection.ToString());
     }
 
     [Test]
@@ -222,7 +222,7 @@ public class TokenValidatorTests
         ConstantTokenValidator validator = new ConstantTokenValidator();
         validator.Validate(token, context);
 
-        Assert.IsFalse(validator.Errors.IsOk, validator.Errors.ToString());
+        Assert.IsFalse(validator.ErrorCollection.IsOk, validator.ErrorCollection.ToString());
     }
 
     [Test]
@@ -235,6 +235,6 @@ public class TokenValidatorTests
         ConstantTokenValidator validator = new ConstantTokenValidator();
         validator.Validate(token, context);
 
-        Assert.IsTrue(validator.Errors.IsOk, validator.Errors.ToString());
+        Assert.IsTrue(validator.ErrorCollection.IsOk, validator.ErrorCollection.ToString());
     }
 }

@@ -6,13 +6,13 @@ public static class TokenValidatorSelector
 {
     public static TokenValidator GetValidator(TokenId tokenId)
     {
+        // labels and instructions are handled separately so use a DiscardedTokenValidator here to do nothing during validation.
+
         switch (tokenId)
         {
             case TokenId.LABEL:
-                return new LabelTokenValidator();
+                return new DiscardedTokenValidator();
             case TokenId.INSTRUCTION:
-                // instructions are handled differently
-                // as they are defined by the tokens that follow them
                 return new DiscardedTokenValidator();
             case TokenId.REGISTER:
                 return new RegisterTokenValidator();

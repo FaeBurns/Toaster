@@ -7,7 +7,7 @@ public class LabelArgumentTokenValidator : TokenValidator
         string label = token.RegexResult.Groups[1].Value;
         if (!context.Labels.Contains(label))
         {
-            Errors.RaiseError($"label \"{label}\" could not be found", token.Position);
+            ErrorCollection.RaiseError($"label \"{label}\" could not be found", token.Position);
         }
     }
 }

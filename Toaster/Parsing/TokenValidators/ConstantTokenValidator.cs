@@ -21,7 +21,7 @@ public class ConstantTokenValidator : TokenValidator
                 _ => throw new ArgumentOutOfRangeException(),
             };
 
-            Errors.RaiseError($"Value is higher than maximum ({maxValue})", token.Position);
+            ErrorCollection.RaiseError($"Value is higher than maximum ({maxValue})", token.Position);
         }
     }
 }

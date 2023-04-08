@@ -11,11 +11,11 @@ public class SinglePinTokenValidator : TokenValidator
         {
             int pinIndex = ValueExtractorSource.SinglePinExtractor.ExtractValue(token);
             if (pinIndex >= context.PinCount)
-                Errors.RaiseError($"Pin exceeds allowed range (max {context.PinCount})", token.Position);
+                ErrorCollection.RaiseError($"Pin exceeds allowed range (max {context.PinCount})", token.Position);
         }
         catch (OverflowException e)
         {
-            Errors.RaiseError(e.Message, token.Position);
+            ErrorCollection.RaiseError(e.Message, token.Position);
         }
     }
 }

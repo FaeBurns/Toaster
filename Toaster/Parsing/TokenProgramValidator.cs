@@ -40,19 +40,20 @@ public class TokenProgramValidator
 
             // set error target
             // and validate
-            validator.Errors = ErrorCollection;
+            validator.ErrorCollection = ErrorCollection;
             validator.Validate(token, validationContext);
         }
     }
 
-    private static void PreprocessLabels(TokenProgram program, TokenValidationContext validationContext)
+    private void PreprocessLabels(TokenProgram program, TokenValidationContext validationContext)
     {
         // validate all labels
         foreach (TokenLine tokenLine in program.Lines)
         {
             if (tokenLine.IsLabel)
             {
-                TokenValidator validator = TokenValidatorSelector.GetValidator(tokenLine.Tokens[0].Id);
+                TokenValidator validator = new LabelTokenValidator();
+                validator.ErrorCollection = ErrorCollection;
                 validator.Validate(tokenLine.Tokens[0], validationContext);
             }
         }

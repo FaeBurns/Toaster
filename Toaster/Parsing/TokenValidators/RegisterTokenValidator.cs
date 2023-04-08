@@ -7,7 +7,7 @@ public class RegisterTokenValidator : TokenValidator
         string register = token.RegexResult.Groups[1].Value;
         if (!context.Registers.Contains(register))
         {
-            Errors.RaiseError($"Unknown register {register}", token.Position);
+            ErrorCollection.RaiseError($"Unknown register {register}", token.Position);
         }
     }
 }

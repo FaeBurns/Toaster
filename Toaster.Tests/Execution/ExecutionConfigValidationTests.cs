@@ -51,7 +51,7 @@ public class ExecutionConfigValidationTests
             validator.Validate();
 
             Assert.IsTrue(validator.HasErrors, $"register name: {invalidName} did not raise an error");
-            Assert.AreEqual(1, validator.Errors.Count);
+            Assert.AreEqual(1, validator.ValidationErrors.Count);
         }
     }
 
@@ -70,7 +70,7 @@ public class ExecutionConfigValidationTests
         validator.Validate();
 
         Assert.IsTrue(validator.HasErrors);
-        Assert.AreEqual(4, validator.Errors.Count);
+        Assert.AreEqual(4, validator.ValidationErrors.Count);
     }
 
     [Test]
@@ -90,6 +90,6 @@ public class ExecutionConfigValidationTests
         validator.Validate();
 
         Assert.IsTrue(validator.HasErrors);
-        Assert.AreEqual(1, validator.Errors.Count);
+        Assert.AreEqual(1, validator.ValidationErrors.Count);
     }
 }

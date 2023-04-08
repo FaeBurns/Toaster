@@ -28,11 +28,20 @@ public class Interpreter : IExecutionContext
     public Interpreter(ExecutionConfig config, TokenProgram tokenProgram)
     {
         // validate config before setup
-        ExecutionConfigValidator validator = new ExecutionConfigValidator(config);
-        validator.Validate();
+        ExecutionConfigValidator configValidator = new ExecutionConfigValidator(config);
+        configValidator.Validate();
 
-        if (validator.HasErrors)
-            throw new ArgumentException($"validation of argument {config} shows errors", nameof(config));
+        // throw if configValidator found errors
+        if (configValidator.HasErrors)
+            throw new ArgumentException($"{nameof(ExecutionConfig)} failed validation check", nameof(config));
+
+        // validate program before continuing setup
+        TokenProgramValidator programValidator = new TokenProgramValidator();
+        programValidator.Validate(tokenProgram, config);
+
+        // throw if programValidator found errors
+        if (programValidator.ErrorCollection.HasErrors)
+            throw new ArgumentException($"{nameof(TokenProgram)} failed validation check", nameof(tokenProgram));
 
         _config = config;
         _tokenProgram = tokenProgram;

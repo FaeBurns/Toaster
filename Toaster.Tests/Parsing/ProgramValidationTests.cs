@@ -46,4 +46,32 @@ public class ProgramValidationTests
         Assert.IsFalse(programValidator.ErrorCollection.IsOk);
         Assert.IsTrue(programValidator.ErrorCollection.Errors[0].Message.StartsWith("Cannot find instruction with name"));
     }
+
+    [Test]
+    public void Invalid_LabelArg()
+    {
+        TokenProgramValidator programValidator = new TokenProgramValidator();
+        programValidator.Validate(TestHelpers.GetProgram("jmp arg"), TestHelpers.GetGenericConfig());
+
+        Assert.IsFalse(programValidator.ErrorCollection.IsOk);
+        Assert.IsTrue(programValidator.ErrorCollection.Errors[0].Message.StartsWith("label \"arg\" could not be found"), programValidator.ErrorCollection.Errors[0].Message);
+    }
+
+    [Test]
+    public void Valid_LabelArg()
+    {
+        TokenProgramValidator programValidator = new TokenProgramValidator();
+        programValidator.Validate(TestHelpers.GetProgram(":label\njmp label"), TestHelpers.GetGenericConfig());
+
+        Assert.IsTrue(programValidator.ErrorCollection.IsOk, programValidator.ErrorCollection.ToString());
+    }
+
+    [Test]
+    public void Valid_LabelArg_After()
+    {
+        TokenProgramValidator programValidator = new TokenProgramValidator();
+        programValidator.Validate(TestHelpers.GetProgram("jmp label\n:label"), TestHelpers.GetGenericConfig());
+
+        Assert.IsTrue(programValidator.ErrorCollection.IsOk, programValidator.ErrorCollection.ToString());
+    }
 }

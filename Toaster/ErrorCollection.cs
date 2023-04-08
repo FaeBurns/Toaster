@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Toaster.Parsing;
@@ -15,6 +16,11 @@ public class ErrorCollection
     public bool IsEmpty => _errors.Count == 0;
 
     public bool IsOk => HighestErrorLevel != ErrorLevel.ERROR;
+
+    /// <summary>
+    /// Gets a value indicating whether this <see cref="ErrorCollection"/> contains any <see cref="Error">Errors</see> with an <see cref="ErrorLevel"/> of <see cref="ErrorLevel.ERROR"/>.
+    /// </summary>
+    public bool HasErrors => !IsOk;
 
     public ErrorLevel HighestErrorLevel { get; private set; } = ErrorLevel.INFO;
 
@@ -44,6 +50,8 @@ public class ErrorCollection
 
     public void Raise(Error error)
     {
+        BreakHelper();
+
         _errors.Add(error);
 
         if (error.Level > HighestErrorLevel)
@@ -84,5 +92,11 @@ public class ErrorCollection
     {
         HighestErrorLevel = ErrorLevel.INFO;
         _errors.Clear();
+    }
+
+    [Conditional("DEBUG")]
+    private void BreakHelper()
+    {
+        Debugger.Break();
     }
 }

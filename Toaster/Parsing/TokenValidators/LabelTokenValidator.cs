@@ -7,7 +7,7 @@ public class LabelTokenValidator : TokenValidator
         string label = token.RegexResult.Groups[1].Value;
         if (context.Labels.Contains(label))
         {
-            Errors.RaiseError($"label \"{label}\" already exists", token.Position);
+            ErrorCollection.RaiseError($"label \"{label}\" already exists", token.Position);
         }
         else
         {
