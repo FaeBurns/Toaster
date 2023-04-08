@@ -135,20 +135,20 @@ public class Interpreter : IExecutionContext
 
     public void SetPin(int pin, bool value)
     {
-        _pinController.SetIndexedPinValue(pin, value);
+        _pinController.SetOutputPin(pin, value);
     }
 
     public void SetPins(int startPin, bool[] values)
     {
         for (int i = 0; i < values.Length; i++)
         {
-            _pinController.SetIndexedPinValue(startPin + i, values[i]);
+            _pinController.SetOutputPin(startPin + i, values[i]);
         }
     }
 
     public bool GetPin(int pin)
     {
-        return _pinController.GetIndexedPinValue(pin);
+        return _pinController.GetPinValue(pin);
     }
 
     public bool[] GetPins(int startPin, int count)
@@ -156,7 +156,7 @@ public class Interpreter : IExecutionContext
         bool[] result = new bool[count];
         for (int i = 0; i < result.Length; i++)
         {
-            result[i] = _pinController.GetIndexedPinValue(startPin + i);
+            result[i] = _pinController.GetPinValue(startPin + i);
         }
         return result;
     }
