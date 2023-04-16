@@ -229,7 +229,7 @@
       ]
     },
     {
-      "name": "clp",
+      "name": "clr",
       "instruction-type": "Pin.ClearPins",
       "parameters": [
         "PIN_ALL"

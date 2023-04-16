@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using Toaster.Instructions;
 using Toaster.Parsing;
 
 namespace Toaster.Execution;
@@ -12,13 +10,17 @@ public class Interpreter : IExecutionContext
     private readonly TokenProgram _tokenProgram;
     private readonly FlowController _flowController;
     private readonly RegisterController _registerController;
-    private readonly PinController _pinController;
     private readonly Stack<StackFrame> _stack = new Stack<StackFrame>();
 
     /// <summary>
     /// Gets the <see cref="ErrorCollection"/> that is populated by errors achieved during execution.
     /// </summary>
     public ErrorCollection InstructionErrorCollection { get; } = new ErrorCollection();
+
+    /// <summary>
+    /// Gets the <see cref="PinController"/> instance used to manage incoming and outgoing pin values.
+    /// </summary>
+    public PinController PinController { get; }
 
     /// <summary>
     /// Gets the current depth of the stack.
@@ -41,13 +43,13 @@ public class Interpreter : IExecutionContext
 
         // throw if programValidator found errors
         if (programValidator.ErrorCollection.HasErrors)
-            throw new ArgumentException($"{nameof(TokenProgram)} failed validation check", nameof(tokenProgram));
+            throw new ArgumentException($"{nameof(TokenProgram)} failed validation check. {programValidator.ErrorCollection}", nameof(tokenProgram));
 
         _config = config;
         _tokenProgram = tokenProgram;
         _flowController = new FlowController(tokenProgram);
         _registerController = new RegisterController(config);
-        _pinController = new PinController(config.PinCount);
+        PinController = new PinController(config.PinCount);
     }
 
     /// <summary>
@@ -144,20 +146,20 @@ public class Interpreter : IExecutionContext
 
     public void SetPin(int pin, bool value)
     {
-        _pinController.SetOutputPin(pin, value);
+        PinController.SetOutputPin(pin, value);
     }
 
     public void SetPins(int startPin, bool[] values)
     {
         for (int i = 0; i < values.Length; i++)
         {
-            _pinController.SetOutputPin(startPin + i, values[i]);
+            PinController.SetOutputPin(startPin + i, values[i]);
         }
     }
 
     public bool GetPin(int pin)
     {
-        return _pinController.GetPinValue(pin);
+        return PinController.GetPinValue(pin);
     }
 
     public bool[] GetPins(int startPin, int count)
@@ -165,7 +167,7 @@ public class Interpreter : IExecutionContext
         bool[] result = new bool[count];
         for (int i = 0; i < result.Length; i++)
         {
-            result[i] = _pinController.GetPinValue(startPin + i);
+            result[i] = PinController.GetPinValue(startPin + i);
         }
         return result;
     }

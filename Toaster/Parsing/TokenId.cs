@@ -59,10 +59,10 @@ public enum TokenId : uint
     PIN = 1 << 7,
 
     /// <summary>
-    /// <para>A binary number. Maximum of 16 bits, minimum of 1. That single bit can be a 0.</para>
+    /// <para>A binary number. Maximum of 16 bits, minimum of 1. That single bit can be a 0. Can be segmented by underscores. Cannot contain trailing underscores</para>
     /// <para>0b100, 0b0</para>
     /// </summary>
-    [TokenRule(@"0b([01]+)")]
+    [TokenRule(@"0b([01]+[01_]*[01]+|[01])")]
     BINARY = 1 << 8,
 
     /// <summary>

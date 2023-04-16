@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Toaster.Parsing;
 
@@ -97,6 +98,8 @@ public class ErrorCollection
     [Conditional("DEBUG")]
     private void BreakHelper()
     {
-        Debugger.Break();
+        // check for attachment first or unit tests can sometimes hang for upwards of 30 seconds
+        if (Debugger.IsAttached)
+            Debugger.Break();
     }
 }

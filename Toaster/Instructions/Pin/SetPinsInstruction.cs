@@ -20,7 +20,8 @@ public class SetPinsInstruction : Instruction
             // by checking if the ith bit is set
             // use left to right
             // starting from pinCount - 1 as offset
-            bool set = (value & (startBit >>> i)) != 0;
+            int valueMask = startBit >>> i;
+            bool set = (value & valueMask) != 0;
             values[i] = set;
         }
 

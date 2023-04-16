@@ -13,7 +13,7 @@ public class ConstantValueExtractor : TokenValueExtractor<ushort>
         switch (token.Id)
         {
             case TokenId.BINARY:
-                return Convert.ToUInt16(tokenContent, 2);
+                return Convert.ToUInt16(tokenContent.Replace("_", ""), 2);
             case TokenId.HEX:
                 return Convert.ToUInt16(tokenContent, 16);
             case TokenId.INTEGER:

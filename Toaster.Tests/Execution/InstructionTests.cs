@@ -22,6 +22,20 @@ public class InstructionTests
         Assert.AreEqual(value, registerValues[name]);
     }
 
+    private void TestPin(Interpreter interpreter, int pinIndex, bool pinValue)
+    {
+        Assert.AreEqual(pinValue, interpreter.PinController.GetOutputPin(pinIndex), $"pin at index {pinIndex} did not have expected value of {pinValue}");
+    }
+
+    private void TestPins(Interpreter interpreter, int startIndex, params bool[] values)
+    {
+        for (int i = 0; i < values.Length; i++)
+        {
+            bool value = interpreter.PinController.GetOutputPin(i + startIndex);
+            Assert.AreEqual(values[i], value, $"value at pin {i + startIndex} is incorrect");
+        }
+    }
+
     private Interpreter InterpretProgram(string program)
     {
         TokenProgram parsedProgram = new Parser().Tokenize(program);
@@ -145,5 +159,254 @@ public class InstructionTests
         // and
         AssertStep(interpreter);
         TestRegister(interpreter, "named1", 43690);
+    }
+
+    [Test]
+    public void MoveShiftLeftInstruction()
+    {
+        Interpreter interpreter = InterpretProgram("msl $named0 0b00001111 2");
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "named0", 60);
+    }
+
+    [Test]
+    public void MoveShiftRightInstruction_Truncated()
+    {
+        Interpreter interpreter = InterpretProgram("msr $named0 0b00001111 2");
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "named0", 3);
+    }
+
+    [Test]
+    public void MoveShiftRightInstruction()
+    {
+        Interpreter interpreter = InterpretProgram("msr $named0 0b00001100 2");
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "named0", 3);
+    }
+
+    [Test]
+    public void NotInstruction()
+    {
+        Interpreter interpreter = InterpretProgram("mov $r0 0b0000111100001111\nnot $r0");
+
+        // mov
+        interpreter.Step();
+
+        // not
+        AssertStep(interpreter);
+        TestRegister(interpreter, "r0", 61680);
+    }
+
+    [Test]
+    public void OrInstruction()
+    {
+        Interpreter interpreter = InterpretProgram("mov $r0 0b1001_1001_1001_1001\nior $r0 0b0010_0010_0010_0010");
+
+        interpreter.Step();
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "r0", 0b1011_1011_1011_1011);
+    }
+
+    [Test]
+    public void XorInstruction()
+    {
+        Interpreter interpreter = InterpretProgram("mov $r0 0b1001_1001_1001_1001\nxor $r0 0b0011_0011_0011_0011");
+
+        interpreter.Step();
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "r0", 0b1010_1010_1010_1010);
+    }
+
+    [Test]
+    public void TestAreEqualInstruction()
+    {
+        Interpreter interpreter = InterpretProgram("teq 0b1100 0x0C");
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "t", 1);
+    }
+
+    [Test]
+    public void TestAreEqualInstruction_False()
+    {
+        Interpreter interpreter = InterpretProgram("teq 0b1101 0x0C");
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "t", 0);
+    }
+
+    [Test]
+    public void TestNotEqualInstruction()
+    {
+        Interpreter interpreter = InterpretProgram("tne 0b1101 0x0C");
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "t", 1);
+    }
+
+    [Test]
+    public void TestNotEqualInstruction_False()
+    {
+        Interpreter interpreter = InterpretProgram("tne 0b1100 0x0C");
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "t", 0);
+    }
+
+    [Test]
+    public void TestGreaterThanInstruction()
+    {
+        Interpreter interpreter = InterpretProgram("tgt 0b1101 0x0C");
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "t", 1);
+    }
+
+    [Test]
+    public void TestGreaterThanInstruction_False()
+    {
+        Interpreter interpreter = InterpretProgram("tgt 0b1100 0x0C");
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "t", 0);
+    }
+
+    [Test]
+    public void TestLessThanInstruction()
+    {
+        Interpreter interpreter = InterpretProgram("tlt 0b1011 0x0C");
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "t", 1);
+    }
+
+    [Test]
+    public void TestLessThanInstruction_False()
+    {
+        Interpreter interpreter = InterpretProgram("tgt 0b1100 0x0C");
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "t", 0);
+    }
+
+    [Test]
+    public void SetPinsInstruction_Single()
+    {
+        Interpreter interpreter = InterpretProgram("stp .p0 1\nstp .p0 0\nstp .p0 1");
+
+        AssertStep(interpreter);
+        TestPin(interpreter, 0, true);
+
+        AssertStep(interpreter);
+        TestPin(interpreter, 0, false);
+
+        AssertStep(interpreter);
+        TestPin(interpreter, 0, true);
+    }
+
+    [Test]
+    public void SetPinsInstruction_Multiple_SmallerInput()
+    {
+        Interpreter interpreter = InterpretProgram("stp .p0..p7 0b1011\nstp .p2..p7 0xF0\nstp .p0:8 0");
+
+        AssertStep(interpreter);
+        TestPins(interpreter, 0, false, false, false, false, true, false, true, true);
+
+        AssertStep(interpreter);
+        TestPins(interpreter, 0, false, false, true, true, false, false, false, false);
+
+        AssertStep(interpreter);
+        TestPins(interpreter, 0, false, false, false, false, false, false, false, false);
+    }
+
+    [Test]
+    public void SetPinsInstruction_Multiple_BiggerInput()
+    {
+        Interpreter interpreter = InterpretProgram("stp .p0:8 0b1100_0110_0011\nstp .p0:8 0b1_0011_0011");
+
+        AssertStep(interpreter);
+        TestPins(interpreter, 0, false, true, true, false, false, false, true, true);
+
+        AssertStep(interpreter);
+        TestPins(interpreter, 0, false, false, true, true, false, false, true, true);
+    }
+
+    [Test]
+    public void GetPinsInstruction_Single()
+    {
+        Interpreter interpreter = InterpretProgram("ldp $r0 .p0");
+
+        interpreter.PinController.SetInputPin(0, true);
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "r0", 1);
+    }
+
+    [Test]
+    public void GetPinsInstruction_Multiple()
+    {
+        Interpreter interpreter = InterpretProgram("ldp $r0 .p0:8");
+
+        interpreter.PinController.SetInputPin(0, false);
+        interpreter.PinController.SetInputPin(1, true);
+        interpreter.PinController.SetInputPin(2, true);
+        interpreter.PinController.SetInputPin(3, false);
+        interpreter.PinController.SetInputPin(4, false);
+        interpreter.PinController.SetInputPin(5, true);
+        interpreter.PinController.SetInputPin(6, true);
+        interpreter.PinController.SetInputPin(7, false);
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "r0", 102);
+    }
+
+    [Test]
+    public void GetPinsInstruction_InternallySet()
+    {
+        Interpreter interpreter = InterpretProgram("stp .p0:8 102\nldp $r0 .p0:8");
+
+        interpreter.Step();
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "r0", 102);
+    }
+
+    [Test]
+    public void GetPinsInstruction_MergesValue()
+    {
+        Interpreter interpreter = InterpretProgram("stp .p0:8 102\nmov $r0 0b1111_0000_0000_0000\nldp $r0 .p0:8");
+
+        interpreter.Step();
+        interpreter.Step();
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "r0", 0b1111_0000_0110_0110);
+    }
+
+    [Test]
+    public void ClearPinsInstruction_Single()
+    {
+        Interpreter interpreter = InterpretProgram("stp .p0:8 0xFF\nclr .p0");
+
+        interpreter.Step();
+
+        AssertStep(interpreter);
+        TestPin(interpreter, 0, false);
+    }
+
+    [Test]
+    public void ClearPinsInstruction_Multiple()
+    {
+        Interpreter interpreter = InterpretProgram("stp .p0:8 0xFF\nclr .p0:8");
+
+        interpreter.Step();
+        AssertStep(interpreter);
+        TestPins(interpreter, 0, false, false, false, false, false, false, false, false);
     }
 }

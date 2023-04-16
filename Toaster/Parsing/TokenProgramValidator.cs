@@ -17,7 +17,7 @@ public class TokenProgramValidator
     {
         // get all register names and create validationContext
         string[] registers = RegisterController.GetRegisterNames(validationTarget);
-        TokenValidationContext validationContext = new TokenValidationContext(registers);
+        TokenValidationContext validationContext = new TokenValidationContext(registers, validationTarget.PinCount);
 
         PreprocessLabels(program, validationContext);
 
@@ -98,6 +98,12 @@ public class TokenProgramValidator
             validDefinitionsString += definition.ToString();
         }
 
-        ErrorCollection.RaiseError($"Could not find valid override for {instructionName}. Valid overrides:\n{validDefinitionsString}", instructionLine.LineIndex, 0, instructionLine.FullLine.Length);
+        string invalidArgumentsString = "";
+        foreach (Token argumentToken in argumentTokens)
+        {
+            invalidArgumentsString += " " + argumentToken.Id;
+        }
+
+        ErrorCollection.RaiseError($"Could not find valid override for {instructionName}{invalidArgumentsString}. Valid overrides:\n{validDefinitionsString}", instructionLine.LineIndex, 0, instructionLine.FullLine.Length);
     }
 }

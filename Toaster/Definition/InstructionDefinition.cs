@@ -25,10 +25,10 @@ public class InstructionDefinition
 
         foreach (DefinitionParameterFlag parameterFlag in Parameters)
         {
-            parametersString += parameterFlag;
+            parametersString += " " + parameterFlag;
         }
 
-        return $"{Name} {parametersString}";
+        return $"{Name}{parametersString}";
     }
 
     public override string ToString()

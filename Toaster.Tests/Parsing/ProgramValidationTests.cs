@@ -34,7 +34,7 @@ public class ProgramValidationTests
         programValidator.Validate(TestHelpers.GetProgram("mov named0 $named"), TestHelpers.GetGenericConfig());
 
         Assert.AreEqual(3, programValidator.ErrorCollection.Errors.Count, programValidator.ErrorCollection.ToString());
-        Assert.IsTrue(programValidator.ErrorCollection.Errors[0].Message.StartsWith("Could not find valid override for mov."), "Fail during message test");
+        Assert.IsTrue(programValidator.ErrorCollection.Errors[0].Message.StartsWith("Could not find valid override for mov"), "Fail during message test");
     }
 
     [Test]

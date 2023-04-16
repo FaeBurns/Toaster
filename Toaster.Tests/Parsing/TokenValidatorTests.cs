@@ -14,7 +14,7 @@ public class TokenValidatorTests
         Token token1 = TestHelpers.GetSingleToken(":label1");
         Token token2 = TestHelpers.GetSingleToken(":label2");
 
-        TokenValidationContext context = new TokenValidationContext(Array.Empty<string>());
+        TokenValidationContext context = new TokenValidationContext();
 
         LabelTokenValidator validator = new LabelTokenValidator();
         validator.Validate(token1, context);
@@ -33,7 +33,7 @@ public class TokenValidatorTests
         Token token1 = TestHelpers.GetSingleToken(":label1");
         Token token2 = TestHelpers.GetSingleToken(":label1");
 
-        TokenValidationContext context = new TokenValidationContext(Array.Empty<string>());
+        TokenValidationContext context = new TokenValidationContext();
 
         LabelTokenValidator validator = new LabelTokenValidator();
         validator.Validate(token1, context);
@@ -54,7 +54,7 @@ public class TokenValidatorTests
         TokenValidationContext context = new TokenValidationContext(new[]
         {
             "found",
-        });
+        }, 0);
 
         RegisterTokenValidator validator = new RegisterTokenValidator();
         validator.Validate(token, context);
@@ -70,7 +70,7 @@ public class TokenValidatorTests
         TokenValidationContext context = new TokenValidationContext(new[]
         {
             "found",
-        });
+        }, 0);
 
         RegisterTokenValidator validator = new RegisterTokenValidator();
         validator.Validate(token, context);
@@ -84,7 +84,7 @@ public class TokenValidatorTests
         // whitespace before token stops it from becoming instruction token
         Token token = TestHelpers.GetSingleToken(" name");
 
-        TokenValidationContext context = new TokenValidationContext(Array.Empty<string>());
+        TokenValidationContext context = new TokenValidationContext();
 
         LabelArgumentTokenValidator validator = new LabelArgumentTokenValidator();
         validator.Validate(token, context);
@@ -96,7 +96,7 @@ public class TokenValidatorTests
     public void LabelArgumentTokenValidator_Valid()
     {
         Token token = TestHelpers.GetSingleToken(" name");
-        TokenValidationContext context = new TokenValidationContext(Array.Empty<string>());
+        TokenValidationContext context = new TokenValidationContext();
         context.Labels.Add("name");
 
         LabelArgumentTokenValidator validator = new LabelArgumentTokenValidator();
@@ -111,7 +111,7 @@ public class TokenValidatorTests
         // don't need to test the multiple types as that's done in ValueExtractorTests
         Token token = TestHelpers.GetSingleToken(".p8..p0");
 
-        TokenValidationContext context = new TokenValidationContext(Array.Empty<string>());
+        TokenValidationContext context = new TokenValidationContext();
 
         MultiPinTokenValidator validator = new MultiPinTokenValidator();
         validator.Validate(token, context);
@@ -125,7 +125,7 @@ public class TokenValidatorTests
         // don't need to test the multiple types as that's done in ValueExtractorTests
         Token token = TestHelpers.GetSingleToken(".p0:8");
 
-        TokenValidationContext context = new TokenValidationContext(Array.Empty<string>())
+        TokenValidationContext context = new TokenValidationContext()
         {
             PinCount = 4,
         };
@@ -142,7 +142,7 @@ public class TokenValidatorTests
         // don't need to test the multiple types as that's done in ValueExtractorTests
         Token token = TestHelpers.GetSingleToken(".p0:9999999999999999999999");
 
-        TokenValidationContext context = new TokenValidationContext(Array.Empty<string>());
+        TokenValidationContext context = new TokenValidationContext();
 
         MultiPinTokenValidator validator = new MultiPinTokenValidator();
         validator.Validate(token, context);
@@ -156,7 +156,7 @@ public class TokenValidatorTests
         // don't need to test the multiple types as that's done in ValueExtractorTests
         Token token = TestHelpers.GetSingleToken(".p0..p7");
 
-        TokenValidationContext context = new TokenValidationContext(Array.Empty<string>())
+        TokenValidationContext context = new TokenValidationContext()
         {
             PinCount = 8,
         };
@@ -172,7 +172,7 @@ public class TokenValidatorTests
     {
         Token token = TestHelpers.GetSingleToken(".p99999999999999999999");
 
-        TokenValidationContext context = new TokenValidationContext(Array.Empty<string>());
+        TokenValidationContext context = new TokenValidationContext();
 
         SinglePinTokenValidator validator = new SinglePinTokenValidator();
         validator.Validate(token, context);
@@ -185,7 +185,7 @@ public class TokenValidatorTests
     {
         Token token = TestHelpers.GetSingleToken(".p4");
 
-        TokenValidationContext context = new TokenValidationContext(Array.Empty<string>())
+        TokenValidationContext context = new TokenValidationContext()
         {
             PinCount = 4,
         };
@@ -201,7 +201,7 @@ public class TokenValidatorTests
     {
         Token token = TestHelpers.GetSingleToken(".p3");
 
-        TokenValidationContext context = new TokenValidationContext(Array.Empty<string>())
+        TokenValidationContext context = new TokenValidationContext()
         {
             PinCount = 8,
         };
@@ -217,7 +217,7 @@ public class TokenValidatorTests
     {
         Token token = TestHelpers.GetSingleToken("9999999999999999999");
 
-        TokenValidationContext context = new TokenValidationContext(Array.Empty<string>());
+        TokenValidationContext context = new TokenValidationContext();
 
         ConstantTokenValidator validator = new ConstantTokenValidator();
         validator.Validate(token, context);
@@ -230,7 +230,20 @@ public class TokenValidatorTests
     {
         Token token = TestHelpers.GetSingleToken("3");
 
-        TokenValidationContext context = new TokenValidationContext(Array.Empty<string>());
+        TokenValidationContext context = new TokenValidationContext();
+
+        ConstantTokenValidator validator = new ConstantTokenValidator();
+        validator.Validate(token, context);
+
+        Assert.IsTrue(validator.ErrorCollection.IsOk, validator.ErrorCollection.ToString());
+    }
+
+    [Test]
+    public void BinaryConstant_Separated()
+    {
+        Token token = TestHelpers.GetSingleToken("0b0000_0000_1111_0000");
+
+        TokenValidationContext context = new TokenValidationContext();
 
         ConstantTokenValidator validator = new ConstantTokenValidator();
         validator.Validate(token, context);

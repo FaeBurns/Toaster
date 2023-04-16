@@ -58,6 +58,8 @@ public class LineExecutor
                 arguments[i] = line.Tokens[i + 1];
             }
 
+            BreakHelper();
+
             // execute instruction
             instruction.Execute(_context, arguments);
         }
@@ -67,6 +69,13 @@ public class LineExecutor
         }
 
         return ErrorCollection.IsEmpty;
+    }
+
+    [Conditional("DEBUG")]
+    private void BreakHelper()
+    {
+        if (Debugger.IsAttached)
+            Debugger.Break();
     }
 }
 

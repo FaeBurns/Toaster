@@ -4,8 +4,15 @@ namespace Toaster.Parsing.TokenValidators;
 
 public class TokenValidationContext
 {
-    public TokenValidationContext(IEnumerable<string> registers)
+    public TokenValidationContext()
     {
+        PinCount = 0;
+        Registers = new HashSet<string>();
+    }
+
+    public TokenValidationContext(IEnumerable<string> registers, int pinCount)
+    {
+        PinCount = pinCount;
         Registers = new HashSet<string>(registers);
     }
 

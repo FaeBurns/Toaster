@@ -38,7 +38,7 @@ public class PinController
         if (index >= PinCount)
             throw new ArgumentOutOfRangeException(nameof(index), index, "index must be less than the pin count");
 
-        // return result of or to get if it's set in either.
+        // return result of or operation to get if it's set in either.
         return _inputValues[index] | _outputValues[index];
     }
 
