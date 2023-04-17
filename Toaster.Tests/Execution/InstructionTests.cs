@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using Toaster.Execution;
 using Toaster.Parsing;
@@ -9,6 +10,14 @@ namespace Toaster.Tests.Execution;
 [TestFixture]
 public class InstructionTests
 {
+    private void ExecuteAll(Interpreter interpreter)
+    {
+        while (!interpreter.Finished)
+        {
+            AssertStep(interpreter);
+        }
+    }
+
     private void AssertStep(Interpreter interpreter)
     {
         interpreter.Step();
@@ -408,5 +417,262 @@ public class InstructionTests
         interpreter.Step();
         AssertStep(interpreter);
         TestPins(interpreter, 0, false, false, false, false, false, false, false, false);
+    }
+
+    [Test]
+    public void JumpInstruction_PreviousLabel()
+    {
+        string program = ":label\nadd 1\njmp label";
+        Interpreter interpreter = InterpretProgram(program);
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "acc", 1);
+        Assert.AreEqual(1, interpreter.CurrentLineIndex);
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "acc", 1);
+        Assert.AreEqual(2, interpreter.CurrentLineIndex);
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "acc", 2);
+        Assert.AreEqual(1, interpreter.CurrentLineIndex);
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "acc", 2);
+        Assert.AreEqual(2, interpreter.CurrentLineIndex);
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "acc", 3);
+        Assert.AreEqual(1, interpreter.CurrentLineIndex);
+    }
+
+    [Test]
+    public void JumpInstruction_Bounce()
+    {
+        // :label1
+        // jmp label2
+        // mov $r0 1 ? should never occur
+        // :label2
+        // jmp label1
+        // mov $r0 2
+        Interpreter interpreter = InterpretProgram(":label1\njmp label2\nmov $r0 100\n:label2\njmp label1");
+
+        // loop it 5 times to make sure it keeps in the loop
+        for (int i = 0; i < 5; i++)
+        {
+            AssertStep(interpreter);
+            Assert.AreEqual(interpreter.CurrentLineIndex, 1);
+            TestRegister(interpreter, "r0", 0);
+
+            AssertStep(interpreter);
+            Assert.AreEqual(interpreter.CurrentLineIndex, 4);
+            TestRegister(interpreter, "r0", 0);
+        }
+    }
+
+    [Test]
+    public void JumpInstruction_Bounce_Index()
+    {
+        // mov $r1 1
+        // jmp 3
+        // mov $r0 1 ? should never occur
+        // jmp $r1
+        // mov $r0 2
+        Interpreter interpreter = InterpretProgram("mov $r1 1\njmp 3\nmov $r0 1\njmp $r1\nmov $r0 1");
+
+        // mov
+        interpreter.Step();
+
+        // loop it 5 times to make sure it keeps in the loop
+        for (int i = 0; i < 5; i++)
+        {
+            AssertStep(interpreter);
+            Assert.AreEqual(interpreter.CurrentLineIndex, 1);
+            TestRegister(interpreter, "r0", 0);
+
+            AssertStep(interpreter);
+            Assert.AreEqual(interpreter.CurrentLineIndex, 3);
+            TestRegister(interpreter, "r0", 0);
+        }
+    }
+
+    [Test]
+    public void JumpSetReturnInstruction()
+    {
+        // mov is for padding
+        Interpreter interpreter = InterpretProgram(":label\nmov $acc $acc\njsr label");
+
+        Assert.AreEqual(0, interpreter.StackDepth);
+
+        // loop to ensure
+        for (int i = 0; i < 5; i++)
+        {
+            // mov
+            interpreter.Step();
+
+            AssertStep(interpreter);
+            Assert.AreEqual(i + 1, interpreter.StackDepth);
+            TestRegister(interpreter, "ra", 3);
+        }
+    }
+
+    [Test]
+    public void JumpSetReturnInstruction_Overflow()
+    {
+        Interpreter interpreter = InterpretProgram(":label\njsr label");
+
+        Assert.AreEqual(0, interpreter.StackDepth);
+
+        // loop to ensure
+        // run 5 times to reach depth limit
+        for (int i = 0; i < 5; i++)
+        {
+            AssertStep(interpreter);
+            Assert.AreEqual(i + 1, interpreter.StackDepth);
+        }
+
+        interpreter.Step();
+        Assert.IsTrue(interpreter.HasErrors, interpreter.InstructionErrorCollection.ToString());
+
+        Console.WriteLine(interpreter.InstructionErrorCollection.ToString());
+    }
+
+    [Test]
+    public void ReturnInstruction()
+    {
+        Interpreter interpreter = InterpretProgram("mov $s0 1\njsr label\n:label\nmov $s0 2\n ret");
+
+        // mov
+        interpreter.Step();
+        TestRegister(interpreter, "s0", 1);
+
+        // jsr
+        interpreter.Step();
+        TestRegister(interpreter, "s0", 0);
+
+        // mov
+        interpreter.Step();
+        Assert.AreEqual(3, interpreter.CurrentLineIndex);
+        TestRegister(interpreter, "s0", 2);
+
+        // ret
+        AssertStep(interpreter);
+        // test that $s0 has reverted to the previous pre-jump value
+        TestRegister(interpreter, "s0", 1);
+    }
+
+    [Test]
+    public void ReturnIfTrueInstruction_Recursive()
+    {
+        string[] programLines = new[]
+        {
+            "mov $r0 4",
+            "jsr loop",
+            "jmp exit",
+            ":loop",
+            "teq $acc $r0",
+            "rit",
+            "add 1",
+            "jsr loop",
+            "ret",
+            ":exit",
+        };
+
+        Interpreter interpreter = InterpretProgram(string.Join("\n", programLines));
+
+        ExecuteAll(interpreter);
+
+        Assert.AreEqual(0, interpreter.StackDepth);
+        TestRegister(interpreter, "acc", 4);
+    }
+
+    [Test]
+    public void ReturnInstruction_ReturnValue()
+    {
+        Interpreter interpreter = InterpretProgram("jsr func\njmp exit\n:func\nret 5\n:exit");
+
+        ExecuteAll(interpreter);
+
+        TestRegister(interpreter, "rv", 5);
+    }
+
+    [Test]
+    public void BranchAreEqualInstruction_True()
+    {
+        Interpreter interpreter = InterpretProgram("beq label 1 1\nmov $r0 1\n:label");
+
+        ExecuteAll(interpreter);
+
+        TestRegister(interpreter, "r0", 0);
+    }
+
+    [Test]
+    public void BranchAreEqualInstruction_False()
+    {
+        Interpreter interpreter = InterpretProgram("beq label 1 5\nmov $r0 1\n:label");
+
+        ExecuteAll(interpreter);
+
+        TestRegister(interpreter, "r0", 1);
+    }
+
+    [Test]
+    public void BranchGreaterThanInstruction_True()
+    {
+        Interpreter interpreter = InterpretProgram("bgt label 2 1\nmov $r0 1\n:label");
+
+        ExecuteAll(interpreter);
+
+        TestRegister(interpreter, "r0", 0);
+    }
+
+    [Test]
+    public void BranchGreaterThanInstruction_False()
+    {
+        Interpreter interpreter = InterpretProgram("bgt label 1 1\nmov $r0 1\n:label");
+
+        ExecuteAll(interpreter);
+
+        TestRegister(interpreter, "r0", 1);
+    }
+
+    [Test]
+    public void BranchLessThanInstruction_True()
+    {
+        Interpreter interpreter = InterpretProgram("blt label 1 2\nmov $r0 1\n:label");
+
+        ExecuteAll(interpreter);
+
+        TestRegister(interpreter, "r0", 0);
+    }
+
+    [Test]
+    public void BranchLessThanInstruction_False()
+    {
+        Interpreter interpreter = InterpretProgram("blt label 1 1\nmov $r0 1\n:label");
+
+        ExecuteAll(interpreter);
+
+        TestRegister(interpreter, "r0", 1);
+    }
+
+    [Test]
+    public void BranchNotEqualInstruction_True()
+    {
+        Interpreter interpreter = InterpretProgram("bne label 2 1\nmov $r0 1\n:label");
+
+        ExecuteAll(interpreter);
+
+        TestRegister(interpreter, "r0", 0);
+    }
+
+    [Test]
+    public void BranchNotEqualInstruction_False()
+    {
+        Interpreter interpreter = InterpretProgram("bne label 1 1\nmov $r0 1\n:label");
+
+        ExecuteAll(interpreter);
+
+        TestRegister(interpreter, "r0", 1);
     }
 }

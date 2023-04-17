@@ -74,6 +74,7 @@ public class LineExecutor
     [Conditional("DEBUG")]
     private void BreakHelper()
     {
+        return;
         if (Debugger.IsAttached)
             Debugger.Break();
     }

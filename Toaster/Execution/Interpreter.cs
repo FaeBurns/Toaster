@@ -8,7 +8,7 @@ public class Interpreter : IExecutionContext
 {
     private readonly ExecutionConfig _config;
     private readonly TokenProgram _tokenProgram;
-    private readonly FlowController _flowController;
+    public FlowController FlowController { get; }
     private readonly RegisterController _registerController;
     private readonly Stack<StackFrame> _stack = new Stack<StackFrame>();
 
@@ -21,6 +21,21 @@ public class Interpreter : IExecutionContext
     /// Gets the <see cref="PinController"/> instance used to manage incoming and outgoing pin values.
     /// </summary>
     public PinController PinController { get; }
+
+    /// <summary>
+    /// Gets the index of the line currently being executed.
+    /// </summary>
+    public int CurrentLineIndex => FlowController.CurrentLineIndex;
+
+    /// <summary>
+    /// Gets a value indicating whether the interpreter has errors.
+    /// </summary>
+    public bool HasErrors => InstructionErrorCollection.HasErrors;
+
+    /// <summary>
+    /// Gets a value indicating whether the interpreter has reached the end of the program.
+    /// </summary>
+    public bool Finished => FlowController.NextLineIndex < 0;
 
     /// <summary>
     /// Gets the current depth of the stack.
@@ -47,7 +62,7 @@ public class Interpreter : IExecutionContext
 
         _config = config;
         _tokenProgram = tokenProgram;
-        _flowController = new FlowController(tokenProgram);
+        FlowController = new FlowController(tokenProgram);
         _registerController = new RegisterController(config);
         PinController = new PinController(config.PinCount);
     }
@@ -57,16 +72,19 @@ public class Interpreter : IExecutionContext
     /// </summary>
     public void Step()
     {
+        if (HasErrors)
+            throw new InvalidOperationException($"Cannot step interpreter while it has errors. {InstructionErrorCollection}");
+
         // if next line index is invalid
         // either EOF or invalid jump occured so exit
-        if (_flowController.NextLineIndex < 0)
+        if (FlowController.NextLineIndex < 0)
             return;
 
         // update the current line index
-        _flowController.UpdateCurrent();
+        FlowController.UpdateCurrent();
 
         // get the TokenLine for the current line
-        TokenLine tokenLine = _tokenProgram.Lines[_flowController.CurrentLineIndex];
+        TokenLine tokenLine = _tokenProgram.Lines[FlowController.CurrentLineIndex];
 
         // if this line is an instruction
         if (tokenLine.IsInstruction)
@@ -84,44 +102,60 @@ public class Interpreter : IExecutionContext
 
         // if the flow controller was not modified
         // move to the next line
-        if (!_flowController.Modified)
-            _flowController.MoveNext();
+        if (!FlowController.Modified)
+            FlowController.MoveNext();
 
         // reset flow controller information
-        _flowController.Reset();
+        FlowController.Reset();
     }
 
     public void PushFrame()
     {
-        int returnIndex = _flowController.CurrentLineIndex + 1;
+        if (StackDepth >= _config.MaxStackDepth)
+            throw new StackOverflowException($"Cannot exceed {nameof(ExecutionConfig.MaxStackDepth)} as defined by {nameof(ExecutionConfig)}");
+
+        int returnIndex = FlowController.CurrentLineIndex + 1;
         StackFrame frame = new StackFrame(_config.StackRegisterCount, returnIndex);
+
+        // set return address for this frame
+        _registerController.SetRegister("ra", (ushort)returnIndex);
 
         for (int i = 0; i < _config.StackRegisterCount; i++)
         {
+            // save current stack register values
             frame.Registers[i] = _registerController.GetRegister("s" + i);
+
+            // clear current stack register values
+            _registerController.SetRegister("s" + i, 0);
         }
         _stack.Push(frame);
     }
 
     public int PopFrame()
     {
+        if (StackDepth == 0)
+            throw new InvalidOperationException("Cannot pop frame from stack when stack is empty");
+
         StackFrame frame = _stack.Pop();
         for (int i = 0; i < _config.StackRegisterCount; i++)
         {
             _registerController.SetRegister("s" + i, frame.Registers[i]);
         }
 
+        // set visible return address for the current frame
+        _registerController.SetRegister("ra", (ushort)frame.ReturnLineIndex);
+
         return frame.ReturnLineIndex;
     }
 
     public ushort GetLabelLineIndex(string label)
     {
-        return (ushort)_flowController.TryFindLabel(label);
+        return (ushort)FlowController.TryFindLabel(label);
     }
 
     public void Jump(int lineNumber)
     {
-        _flowController.Jump(lineNumber);
+        FlowController.Jump(lineNumber);
     }
 
     /// <summary>

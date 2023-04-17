@@ -23,7 +23,7 @@ public abstract class Instruction
             case TokenId.HEX:
             case TokenId.INTEGER:
                 return ConstantExtractor.ExtractValue(token);
-            case TokenId.LABEL:
+            case TokenId.LABEL_ARG:
                 string labelString = StringExtractor.ExtractValue(token);
                 return context.GetLabelLineIndex(labelString);
         }

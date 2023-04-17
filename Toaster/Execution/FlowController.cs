@@ -14,6 +14,9 @@ public class FlowController
     public FlowController(TokenProgram tokenProgram)
     {
         _tokenProgram = tokenProgram;
+
+        // set line index execution will start at
+        NextLineIndex = GetNextExecutingLineIndex(0);
     }
 
     public void Jump(int targetLineNumber)

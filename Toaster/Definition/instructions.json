@@ -221,6 +221,31 @@
       ]
     },
     {
+      "name": "rit",
+      "instruction-type": "Jump.ReturnIfTrue",
+      "parameters": []
+    },
+    {
+      "name": "rit",
+      "instruction-type": "Jump.ReturnIfTrue",
+      "parameters": [
+        "REGISTER_CONSTANT"
+      ]
+    },{
+      "name": "rif",
+      "instruction-type": "Jump.ReturnIfFalse",
+      "parameters": []
+    },
+    {
+      "name": "rif",
+      "instruction-type": "Jump.ReturnIfFalse",
+      "parameters": [
+        "REGISTER_CONSTANT"
+      ]
+    },
+
+
+    {
       "name": "stp",
       "instruction-type": "Pin.SetPins",
       "parameters": [

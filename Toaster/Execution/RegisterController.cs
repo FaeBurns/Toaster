@@ -22,9 +22,7 @@ public class RegisterController
         // add entry in registers for each discovered name
         foreach (string name in registerNames)
         {
-            // skip all stack registers
-            if (!(name.Length == 2 && name[0] == 's' && int.TryParse(name[1].ToString(), out _)))
-                _allRegisters.Add(name, 0);
+            _allRegisters.Add(name, 0);
         }
     }
 
@@ -51,7 +49,7 @@ public class RegisterController
     public ushort GetRegister(string register)
     {
         if (!_allRegisters.ContainsKey(register))
-            throw new InvalidOperationException("Cannot get value from register that does not exist");
+            throw new InvalidOperationException($"Cannot get value from register {register} as it does not exist");
 
         return _allRegisters[register];
     }
