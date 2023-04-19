@@ -133,4 +133,26 @@ public class PinController
 
         return _outputValues[index];
     }
+
+    /// <summary>
+    /// Gets the values on all input pins.
+    /// </summary>
+    /// <returns>An array containing the values of all input pins.</returns>
+    public bool[] GetInputPins()
+    {
+        bool[] result = new bool[PinCount];
+        Array.Copy(_inputValues, result, PinCount);
+        return result;
+    }
+
+    /// <summary>
+    /// Gets the values on all output pins.
+    /// </summary>
+    /// <returns>An array containing the values of all output pins.</returns>
+    public bool[] GetOutputPins()
+    {
+        bool[] result = new bool[PinCount];
+        Array.Copy(_outputValues, result, PinCount);
+        return result;
+    }
 }

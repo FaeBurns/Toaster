@@ -8,7 +8,7 @@ public class Interpreter : IExecutionContext
 {
     private readonly ExecutionConfig _config;
     private readonly TokenProgram _tokenProgram;
-    public FlowController FlowController { get; }
+    private readonly FlowController _flowController;
     private readonly RegisterController _registerController;
     private readonly Stack<StackFrame> _stack = new Stack<StackFrame>();
 
@@ -25,7 +25,7 @@ public class Interpreter : IExecutionContext
     /// <summary>
     /// Gets the index of the line currently being executed.
     /// </summary>
-    public int CurrentLineIndex => FlowController.CurrentLineIndex;
+    public int CurrentLineIndex => _flowController.CurrentLineIndex;
 
     /// <summary>
     /// Gets a value indicating whether the interpreter has errors.
@@ -35,7 +35,7 @@ public class Interpreter : IExecutionContext
     /// <summary>
     /// Gets a value indicating whether the interpreter has reached the end of the program.
     /// </summary>
-    public bool Finished => FlowController.NextLineIndex < 0;
+    public bool Finished => _flowController.NextLineIndex < 0;
 
     /// <summary>
     /// Gets the current depth of the stack.
@@ -62,7 +62,7 @@ public class Interpreter : IExecutionContext
 
         _config = config;
         _tokenProgram = tokenProgram;
-        FlowController = new FlowController(tokenProgram);
+        _flowController = new FlowController(tokenProgram);
         _registerController = new RegisterController(config);
         PinController = new PinController(config.PinCount);
     }
@@ -77,14 +77,14 @@ public class Interpreter : IExecutionContext
 
         // if next line index is invalid
         // either EOF or invalid jump occured so exit
-        if (FlowController.NextLineIndex < 0)
+        if (_flowController.NextLineIndex < 0)
             return;
 
         // update the current line index
-        FlowController.UpdateCurrent();
+        _flowController.UpdateCurrent();
 
         // get the TokenLine for the current line
-        TokenLine tokenLine = _tokenProgram.Lines[FlowController.CurrentLineIndex];
+        TokenLine tokenLine = _tokenProgram.Lines[_flowController.CurrentLineIndex];
 
         // if this line is an instruction
         if (tokenLine.IsInstruction)
@@ -102,11 +102,11 @@ public class Interpreter : IExecutionContext
 
         // if the flow controller was not modified
         // move to the next line
-        if (!FlowController.Modified)
-            FlowController.MoveNext();
+        if (!_flowController.Modified)
+            _flowController.MoveNext();
 
         // reset flow controller information
-        FlowController.Reset();
+        _flowController.Reset();
     }
 
     public void PushFrame()
@@ -114,7 +114,7 @@ public class Interpreter : IExecutionContext
         if (StackDepth >= _config.MaxStackDepth)
             throw new StackOverflowException($"Cannot exceed {nameof(ExecutionConfig.MaxStackDepth)} as defined by {nameof(ExecutionConfig)}");
 
-        int returnIndex = FlowController.CurrentLineIndex + 1;
+        int returnIndex = _flowController.CurrentLineIndex + 1;
         StackFrame frame = new StackFrame(_config.StackRegisterCount, returnIndex);
 
         // set return address for this frame
@@ -150,12 +150,12 @@ public class Interpreter : IExecutionContext
 
     public ushort GetLabelLineIndex(string label)
     {
-        return (ushort)FlowController.TryFindLabel(label);
+        return (ushort)_flowController.TryFindLabel(label);
     }
 
     public void Jump(int lineNumber)
     {
-        FlowController.Jump(lineNumber);
+        _flowController.Jump(lineNumber);
     }
 
     /// <summary>

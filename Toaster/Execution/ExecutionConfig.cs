@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Toaster.Execution;
 
+/// <summary>
+/// A class containing information about the setup of an <see cref="Interpreter"/> and what functions it can support.
+/// </summary>
 public class ExecutionConfig
 {
     /// <summary>
