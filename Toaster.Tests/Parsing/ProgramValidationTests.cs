@@ -74,4 +74,13 @@ public class ProgramValidationTests
 
         Assert.IsTrue(programValidator.ErrorCollection.IsOk, programValidator.ErrorCollection.ToString());
     }
+
+    [Test]
+    public void Invalid_NonInstructionLines()
+    {
+        TokenProgramValidator programValidator = new TokenProgramValidator();
+        programValidator.Validate(TestHelpers.GetProgram("3\nmov $r0 5"), TestHelpers.GetGenericConfig());
+
+        Assert.IsFalse(programValidator.ErrorCollection.IsOk, programValidator.ErrorCollection.ToString());
+    }
 }

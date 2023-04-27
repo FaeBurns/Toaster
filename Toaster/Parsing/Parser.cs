@@ -64,7 +64,7 @@ public class Parser
         List<Token> tokens = new List<Token>();
 
         // loop while there is still text to search and a critical error has not occured
-        while (searchingSection.Length > 0 && Errors.HighestErrorLevel != ErrorLevel.ERROR)
+        while (searchingSection.Length > 0)
         {
             TokenRule matchingRule = null;
             Match validMatchResult = null;
@@ -116,7 +116,9 @@ public class Parser
             // if no match was found
             else
             {
-                Errors.RaiseError("Unable to parse remainder of line", lineIndex, startPosition, line.Length - 1);
+                // raise error and return
+                Errors.RaiseError("Invalid token found in line.", lineIndex, startPosition, line.Length - 1);
+                return new TokenLine(line, lineIndex, offsetIndex, tokens);
             }
         }
 

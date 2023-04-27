@@ -30,7 +30,7 @@ public class Error
 
     public override string ToString()
     {
-        return $"(Line: {Position.Line} | Column: {Position.StartColumn} | ErrorLevel: {Level} | Message: {Message})";
+        return $"(Line: {Position.Line + 1} | Column: {Position.StartColumn} | Message: {Message})";
     }
 }
 

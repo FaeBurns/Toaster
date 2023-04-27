@@ -33,7 +33,7 @@ public enum TokenId : uint
     /// <para>A label passed as an instruction argument</para>
     /// <para>name</para>
     /// </summary>
-    [TokenRule(@"([a-zA-Z]+[a-zA-Z0-9_]+)")]
+    [TokenRule(@"([a-zA-Z]+[a-zA-Z0-9_]*)")]
     LABEL_ARG = 1 << 3,
 
     /// <summary>

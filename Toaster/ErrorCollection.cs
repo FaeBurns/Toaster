@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using Toaster.Parsing;
 
 namespace Toaster;
@@ -99,6 +100,9 @@ public class ErrorCollection
     private void BreakHelper()
     {
         // check for attachment first or unit tests can sometimes hang for upwards of 30 seconds
+        // the tests still hang ;-;
+        // but only sometimes
+        // no clue why
         if (Debugger.IsAttached)
             Debugger.Break();
     }

@@ -29,6 +29,19 @@ public class TokenProgramValidator
 
     private void ValidateLine(TokenLine tokenLine, TokenValidationContext validationContext)
     {
+        // skip if line is empty
+        if (tokenLine.Tokens.Count == 0)
+            return;
+
+        // get first token
+        Token firstToken = tokenLine.Tokens[0];
+
+        // if first token is an invalid id
+        if (firstToken.Id != TokenId.INSTRUCTION && firstToken.Id != TokenId.LABEL)
+        {
+            ErrorCollection.RaiseError("Line must start with an instruction or label.", tokenLine.LineIndex, 0, tokenLine.FullLine.Length - 1);
+        }
+
         foreach (Token token in tokenLine.Tokens)
         {
             // validate if instruction
@@ -71,13 +84,16 @@ public class TokenProgramValidator
             throw new ArgumentException($"input {nameof(TokenLine)} must be an instruction line", nameof(instructionLine));
 
         StringValueExtractor instructionExtractor = new StringValueExtractor();
-        string instructionName = instructionExtractor.ExtractValue(instructionLine.Tokens[0]);
+        Token instructionToken = instructionLine.Tokens[0];
+        string instructionName = instructionExtractor.ExtractValue(instructionToken);
 
         // get all instructions but the first
         IEnumerable<Token> argumentTokens = instructionLine.Tokens.Skip(1);
 
-        // try and get instruction
-        Instruction instruction = InstructionManager.TryFetchInstructionBySignature(instructionName, argumentTokens.Select(t => t.Id).ToArray());
+        // try and find instruction from tokens signature
+        // avoid multiple enumeration first
+        Token[] enumeratedArgumentTokens = argumentTokens as Token[] ?? argumentTokens.ToArray();
+        Instruction instruction = InstructionManager.TryFetchInstructionBySignature(instructionName, enumeratedArgumentTokens.Select(t => t.Id).ToArray());
 
         // return okay if instruction was found
         if (instruction != null)
@@ -85,7 +101,7 @@ public class TokenProgramValidator
 
         if (!InstructionManager.GetHasInstructionWithName(instructionName))
         {
-            ErrorCollection.RaiseError($"Cannot find instruction with name {instructionName}", instructionLine.LineIndex, 0, instructionLine.FullLine.Length);
+            ErrorCollection.RaiseError($"Cannot find instruction with name {instructionName}", instructionToken.Position);
             return;
         }
 
@@ -99,11 +115,13 @@ public class TokenProgramValidator
         }
 
         string invalidArgumentsString = "";
-        foreach (Token argumentToken in argumentTokens)
+        foreach (Token argumentToken in enumeratedArgumentTokens)
         {
             invalidArgumentsString += " " + argumentToken.Id;
         }
 
-        ErrorCollection.RaiseError($"Could not find valid override for {instructionName}{invalidArgumentsString}. Valid overrides:\n{validDefinitionsString}", instructionLine.LineIndex, 0, instructionLine.FullLine.Length);
+        // get end column of last token and raise error
+        int endColumn = instructionLine.Tokens.Last().Position.EndColumn;
+        ErrorCollection.RaiseError($"Could not find valid override for {instructionName}{invalidArgumentsString}. Valid overrides:\n{validDefinitionsString}", instructionLine.LineIndex, 0, endColumn);
     }
 }
