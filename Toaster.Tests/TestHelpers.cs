@@ -40,6 +40,7 @@ public static class TestHelpers
             MaxStackDepth = 5,
             StackRegisterCount = 4,
             BasicRegisterCount = 4,
+            StepsPerInstruction = 1,
         };
     }
 }

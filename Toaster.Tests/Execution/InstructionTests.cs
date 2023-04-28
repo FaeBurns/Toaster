@@ -675,4 +675,70 @@ public class InstructionTests
 
         TestRegister(interpreter, "r0", 1);
     }
+
+    [Test]
+    public void Sleep_5()
+    {
+        Interpreter interpreter = InterpretProgram("mov $r0 1\nslp 5\nmov $r0 2");
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "r0", 1);
+
+        // 0
+        AssertStep(interpreter);
+        TestRegister(interpreter, "r0", 1);
+        // 1
+        AssertStep(interpreter);
+        TestRegister(interpreter, "r0", 1);
+        // 2
+        AssertStep(interpreter);
+        TestRegister(interpreter, "r0", 1);
+        // 3
+        AssertStep(interpreter);
+        TestRegister(interpreter, "r0", 1);
+        // 4
+        AssertStep(interpreter);
+        TestRegister(interpreter, "r0", 1);
+        // 5
+        AssertStep(interpreter);
+        TestRegister(interpreter, "r0", 1);
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "r0", 2);
+    }
+
+    [Test]
+    public void Sleep_0()
+    {
+        Interpreter interpreter = InterpretProgram("mov $r0 1\nslp 0\nmov $r0 2");
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "r0", 1);
+
+        // 0
+        AssertStep(interpreter);
+        TestRegister(interpreter, "r0", 1);
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "r0", 2);
+    }
+
+    [Test]
+    public void Sleep_1()
+    {
+        Interpreter interpreter = InterpretProgram("mov $r0 1\nslp 1\nmov $r0 2");
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "r0", 1);
+
+        // 0
+        AssertStep(interpreter);
+        TestRegister(interpreter, "r0", 1);
+        // 1
+        AssertStep(interpreter);
+        TestRegister(interpreter, "r0", 1);
+
+        AssertStep(interpreter);
+        TestRegister(interpreter, "r0", 2);
+    }
 }

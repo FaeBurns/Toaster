@@ -33,4 +33,9 @@ public class ExecutionConfig
     /// Gets or Sets the amount of ($r0) basic registers the interpreter has.
     /// </summary>
     public int BasicRegisterCount = 0;
+
+    /// <summary>
+    /// Gets or Sets the number of steps it takes to execute an instruction. Minimum value of 1
+    /// </summary>
+    public int StepsPerInstruction = 1;
 }

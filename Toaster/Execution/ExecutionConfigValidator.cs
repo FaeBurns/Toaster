@@ -70,6 +70,9 @@ public class ExecutionConfigValidator
         if (_config.BasicRegisterCount < 0)
             Raise(new ConfigValidationError("basic register count found to be negative in config"));
 
+        if (_config.StepsPerInstruction < 1)
+            Raise(new ConfigValidationError("per-instruction step threshold cannot be less than 1"));
+
         return IsOk;
     }
 

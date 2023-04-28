@@ -66,6 +66,7 @@
         <Compile Include="Instructions\Jump\ReturnIfFalseInstruction.cs" />
         <Compile Include="Instructions\Jump\ReturnIfTrueInstruction.cs" />
         <Compile Include="Instructions\Jump\ReturnInstruction.cs" />
+        <Compile Include="Instructions\Jump\SleepInstruction.cs" />
         <Compile Include="Instructions\Math\AddInstruction.cs" />
         <Compile Include="Instructions\Math\DivideInstruction.cs" />
         <Compile Include="Instructions\Math\MultiplyInstruction.cs" />

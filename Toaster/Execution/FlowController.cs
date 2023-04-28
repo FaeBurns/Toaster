@@ -1,15 +1,24 @@
-﻿using Toaster.Parsing;
+﻿using System;
+using Toaster.Parsing;
 
 namespace Toaster.Execution;
 
 public class FlowController
 {
     private readonly TokenProgram _tokenProgram;
+    private int _remainingSleep = 0;
 
     public bool Modified { get; private set; }
-
     public int CurrentLineIndex { get; private set; }
     public int NextLineIndex { get; private set; }
+
+    public int RemainingSleep
+    {
+        get => _remainingSleep;
+        private set => _remainingSleep = Math.Max(0, value);
+    }
+
+    public bool Sleeping => RemainingSleep > 0;
 
     public FlowController(TokenProgram tokenProgram)
     {
@@ -78,5 +87,15 @@ public class FlowController
         }
 
         return -1;
+    }
+
+    public void Sleep(int sleepTime)
+    {
+        RemainingSleep = sleepTime;
+    }
+
+    public void ProcessSleep()
+    {
+        RemainingSleep--;
     }
 }

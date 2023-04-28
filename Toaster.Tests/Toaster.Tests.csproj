@@ -46,6 +46,7 @@
         <Compile Include="Definition\InstructionManagerTests.cs" />
         <Compile Include="Execution\ExecutionConfigValidationTests.cs" />
         <Compile Include="Execution\InstructionTests.cs" />
+        <Compile Include="Execution\MinimumExecutionDelayTests.cs" />
         <Compile Include="Execution\PinControllerTests.cs" />
         <Compile Include="Parsing\ProgramValidationTests.cs" />
         <Compile Include="Parsing\ParserTests.cs" />

@@ -6,11 +6,13 @@ namespace Toaster.Execution;
 
 public class Interpreter : IExecutionContext
 {
-    private readonly ExecutionConfig _config;
+    private readonly ExecutionConfig _executionConfig;
     private readonly TokenProgram _tokenProgram;
     private readonly FlowController _flowController;
     private readonly RegisterController _registerController;
     private readonly Stack<StackFrame> _stack = new Stack<StackFrame>();
+
+    private int _remainingPreStepSleep = 0;
 
     /// <summary>
     /// Gets the <see cref="ErrorCollection"/> that is populated by errors achieved during execution.
@@ -27,6 +29,7 @@ public class Interpreter : IExecutionContext
     /// </summary>
     public int CurrentLineIndex => _flowController.CurrentLineIndex;
 
+
     /// <summary>
     /// Gets a value indicating whether the interpreter has errors.
     /// </summary>
@@ -42,35 +45,45 @@ public class Interpreter : IExecutionContext
     /// </summary>
     public int StackDepth => _stack.Count;
 
-    public Interpreter(ExecutionConfig config, TokenProgram tokenProgram)
+    public Interpreter(ExecutionConfig executionConfig, TokenProgram tokenProgram)
     {
         // validate config before setup
-        ExecutionConfigValidator configValidator = new ExecutionConfigValidator(config);
+        ExecutionConfigValidator configValidator = new ExecutionConfigValidator(executionConfig);
         configValidator.Validate();
 
         // throw if configValidator found errors
         if (configValidator.HasErrors)
-            throw new ArgumentException($"{nameof(ExecutionConfig)} failed validation check", nameof(config));
+            throw new ArgumentException($"{nameof(ExecutionConfig)} failed validation check", nameof(executionConfig));
 
         // validate program before continuing setup
         TokenProgramValidator programValidator = new TokenProgramValidator();
-        programValidator.Validate(tokenProgram, config);
+        programValidator.Validate(tokenProgram, executionConfig);
 
         // throw if programValidator found errors
         if (programValidator.ErrorCollection.HasErrors)
             throw new ArgumentException($"{nameof(TokenProgram)} failed validation check. {programValidator.ErrorCollection}", nameof(tokenProgram));
 
-        _config = config;
+        _executionConfig = executionConfig;
         _tokenProgram = tokenProgram;
         _flowController = new FlowController(tokenProgram);
-        _registerController = new RegisterController(config);
-        PinController = new PinController(config.PinCount);
+        _registerController = new RegisterController(executionConfig);
+        PinController = new PinController(executionConfig.PinCount);
+    }
+
+    public void Step()
+    {
+        _remainingPreStepSleep = Math.Max(0, _remainingPreStepSleep - 1);
+        if (_remainingPreStepSleep == 0)
+        {
+            InstructionStep();
+            _remainingPreStepSleep = _executionConfig.StepsPerInstruction;
+        }
     }
 
     /// <summary>
     /// Advances execution of the program by one instruction
     /// </summary>
-    public void Step()
+    private void InstructionStep()
     {
         if (HasErrors)
             throw new InvalidOperationException($"Cannot step interpreter while it has errors. {InstructionErrorCollection}");
@@ -79,6 +92,13 @@ public class Interpreter : IExecutionContext
         // either EOF or invalid jump occured so exit
         if (_flowController.NextLineIndex < 0)
             return;
+
+        // if currently sleeping, process it and continue
+        if (_flowController.Sleeping)
+        {
+            _flowController.ProcessSleep();
+            return;
+        }
 
         // update the current line index
         _flowController.UpdateCurrent();
@@ -100,10 +120,12 @@ public class Interpreter : IExecutionContext
             }
         }
 
-        // if the flow controller was not modified
-        // move to the next line
+        // if next line target has not been modified (jump)
+        // set next line target
         if (!_flowController.Modified)
+        {
             _flowController.MoveNext();
+        }
 
         // reset flow controller information
         _flowController.Reset();
@@ -111,16 +133,16 @@ public class Interpreter : IExecutionContext
 
     public void PushFrame()
     {
-        if (StackDepth >= _config.MaxStackDepth)
+        if (StackDepth >= _executionConfig.MaxStackDepth)
             throw new StackOverflowException($"Cannot exceed {nameof(ExecutionConfig.MaxStackDepth)} as defined by {nameof(ExecutionConfig)}");
 
         int returnIndex = _flowController.CurrentLineIndex + 1;
-        StackFrame frame = new StackFrame(_config.StackRegisterCount, returnIndex);
+        StackFrame frame = new StackFrame(_executionConfig.StackRegisterCount, returnIndex);
 
         // set return address for this frame
         _registerController.SetRegister("ra", (ushort)returnIndex);
 
-        for (int i = 0; i < _config.StackRegisterCount; i++)
+        for (int i = 0; i < _executionConfig.StackRegisterCount; i++)
         {
             // save current stack register values
             frame.Registers[i] = _registerController.GetRegister("s" + i);
@@ -137,7 +159,7 @@ public class Interpreter : IExecutionContext
             throw new InvalidOperationException("Cannot pop frame from stack when stack is empty");
 
         StackFrame frame = _stack.Pop();
-        for (int i = 0; i < _config.StackRegisterCount; i++)
+        for (int i = 0; i < _executionConfig.StackRegisterCount; i++)
         {
             _registerController.SetRegister("s" + i, frame.Registers[i]);
         }
@@ -156,6 +178,11 @@ public class Interpreter : IExecutionContext
     public void Jump(int lineNumber)
     {
         _flowController.Jump(lineNumber);
+    }
+
+    public void Sleep(int sleepTime)
+    {
+        _flowController.Sleep(sleepTime);
     }
 
     /// <summary>
