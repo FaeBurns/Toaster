@@ -48,6 +48,7 @@
         <Compile Include="Execution\InstructionTests.cs" />
         <Compile Include="Execution\MinimumExecutionDelayTests.cs" />
         <Compile Include="Execution\PinControllerTests.cs" />
+        <Compile Include="Execution\ReturnTests.cs" />
         <Compile Include="Parsing\ProgramValidationTests.cs" />
         <Compile Include="Parsing\ParserTests.cs" />
         <Compile Include="Parsing\TokenValidatorTests.cs" />

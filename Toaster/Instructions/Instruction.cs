@@ -8,6 +8,9 @@ namespace Toaster.Instructions;
 
 public abstract class Instruction
 {
+    // I hate all of this
+    // why the fuck is it like this
+    // uh oh stinky
     protected ConstantValueExtractor ConstantExtractor => ValueExtractorSource.ConstantExtractor;
     protected MultiplePinValueExtractor MultiplePinExtractor => ValueExtractorSource.MultiplePinExtractor;
     protected SinglePinValueExtractor SinglePinExtractor => ValueExtractorSource.SinglePinExtractor;

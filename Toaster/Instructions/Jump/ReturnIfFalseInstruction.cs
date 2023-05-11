@@ -13,9 +13,6 @@ public class ReturnIfFalseInstruction : Instruction
         if (tValue != 0)
             return;
 
-        int targetLineIndex = context.PopFrame();
-        context.Jump(targetLineIndex);
-
         // if optional argument is found
         // set $rv
         if (argumentTokens.Count == 2)
@@ -23,5 +20,8 @@ public class ReturnIfFalseInstruction : Instruction
             ushort value = GetTokenValue(context, argumentTokens[1]);
             context.SetRegisterValue("rv", value);
         }
+        
+        int targetLineIndex = context.PopFrame();
+        context.Jump(targetLineIndex);
     }
 }

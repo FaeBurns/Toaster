@@ -589,7 +589,7 @@ public class InstructionTests
     [Test]
     public void ReturnInstruction_ReturnValue()
     {
-        Interpreter interpreter = InterpretProgram("jsr func\njmp exit\n:func\nret 5\n:exit");
+        Interpreter interpreter = InterpretProgram("jsr func\njmp exit\n:func\nret 5\n:exit\nslp 1");
 
         ExecuteAll(interpreter);
 

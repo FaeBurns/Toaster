@@ -1,6 +1,6 @@
 ﻿namespace Toaster.Execution;
 
-public struct StackFrame
+public readonly struct StackFrame
 {
     public readonly ushort[] Registers;
     public readonly int ReturnLineIndex;
